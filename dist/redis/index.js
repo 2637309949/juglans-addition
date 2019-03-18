@@ -18,7 +18,8 @@ const hooks = require('./hooks');
  */
 
 
-Redis.retryConnect = function (uri, opts, cb) {
+Redis.retryConnect = function (uri, opts) {
+  let cb = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : () => {};
   let retryCount = opts.retryCount || 5;
   opts.lazyConnect = true;
 
