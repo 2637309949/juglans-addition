@@ -11,7 +11,10 @@ const mongoose = require('./mgo');
 
 const Redis = require('./redis');
 
+const mailer = require('./mailer');
+
 module.exports = {
   mongoose,
+  mailer,
   Redis
 };
