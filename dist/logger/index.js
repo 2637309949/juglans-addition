@@ -41,7 +41,8 @@ repo.createLogger = (_ref2) => {
     },
     transports: [new winston.transports.File({
       filename: path.join(_path, 'error.log'),
-      level: 'error'
+      level: 'error',
+      maxsize
     }), new winston.transports.File({
       filename: path.join(_path, 'combined.log'),
       maxsize

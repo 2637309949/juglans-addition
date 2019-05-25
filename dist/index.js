@@ -7,9 +7,9 @@
  * @modify date 2019-01-09 17:15:40
  * @desc [mudule export]
  */
-const mongoose = require('./mgo');
+const mongoose = require('./mgo/mgo');
 
-const Redis = require('./redis');
+const Redis = require('./redis/redis');
 
 const mailer = require('./mailer');
 
