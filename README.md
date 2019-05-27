@@ -1,17 +1,33 @@
 # juglans-addition
+
 Provide global convenience tools, such as cross-module references
-- mongoose  
-hooks:  
-list, create, softDelMany, softDelOne, updateMany, updateOne  
-common:  
-retryConnect
 
-- redis  
-hooks:  
-saveToken, findToken, revokeToken  
-common:  
-retryConnect
+## mongoose addition
+```javascript
+// InitModel
+function InitModel({ router }) {
+  mongoose.Register({
+    name: 'User',
+    displayName: '参数配置',
+    schema: defineSchema,
+    autoHook: false
+  })
+  mongoose.api.List(router, 'User').Pre(async function (ctx) {
+    console.log('before')
+  }).Post(async function (ctx) {
+    console.log('after')
+  })
+  mongoose.api.One(router, 'User')
+  mongoose.api.Delete(router, 'User')
+  mongoose.api.Update(router, 'User')
+  mongoose.api.Create(router, 'User')
+}
 
+// Mount auto model routes
+app.PostUse(mongoose.AutoHook)
+
+```
+## redis addition
 
 ## MIT License
 
