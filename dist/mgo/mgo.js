@@ -16,7 +16,8 @@ const is = require('is');
 const api = require('./api'); // Model detailed list
 
 
-mongoose.m = [];
+mongoose.m = []; // Api for model mount
+
 mongoose.api = api.Api({
   mgo: mongoose
 }); // Connect mongo with retry tactics
@@ -47,7 +48,8 @@ mongoose.Register = function () {
   assert.ok(is.object(carte.schema), 'schema can not be empty!');
   mongoose.m.push(carte);
   return mongoose.model(carte.name, carte.schema);
-};
+}; // Export a juglans plugin
+
 
 mongoose.AutoHook = function (_ref) {
   let {
