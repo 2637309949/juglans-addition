@@ -4,13 +4,9 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-/**
- * @author [Double]
- * @email [2637309949@qq.com]
- * @create date 2019-01-05 14:31:34
- * @modify date 2019-01-05 14:31:34
- * @desc [mongoose Hook]
- */
+// Copyright (c) 2018-2020 Double.  All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file.
 const repo = module.exports;
 
 repo.Hook = function (_ref) {
@@ -39,15 +35,23 @@ repo.Hook.prototype.route = function () {
     /*#__PURE__*/
     function () {
       var _ref2 = _asyncToGenerator(function* (ctx) {
-        if (_this.pre != null) {
+        if (_this.pre) {
           yield _this.pre(ctx);
         }
 
-        if (_this.handler != null) {
-          yield _this.handler(ctx);
+        if (_this.handler) {
+          if (_this.auth) {
+            const ret = yield _this.auth(ctx);
+
+            if (ret) {
+              yield _this.handler(ctx);
+            }
+          } else {
+            yield _this.handler(ctx);
+          }
         }
 
-        if (_this.post != null) {
+        if (_this.post) {
           yield _this.post(ctx);
         }
       });
@@ -68,5 +72,11 @@ repo.Hook.prototype.Pre = function (pre) {
 
 repo.Hook.prototype.Post = function (post) {
   this.post = post;
+  return this;
+}; // Auth hook for after exec spec model router
+
+
+repo.Hook.prototype.Auth = function (auth) {
+  this.auth = auth;
   return this;
 };
