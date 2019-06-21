@@ -1,5 +1,9 @@
 "use strict";
 
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -7,9 +11,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
-const is = require('is');
+const moment = require('moment');
 
-const utils = require('./utils');
+const logger = require('../logger');
+
+const Query = require('./query');
 
 const repo = module.exports;
 
@@ -20,11 +26,23 @@ function () {
     try {
       const id = ctx.params.id;
       const Model = mgo.model(name);
-      const ret = yield Model.findById(id);
+      const q = Query(ctx.query);
+      const project = q.buildProject();
+      const populate = q.buildPopulate();
+      const query = Model.findOne({
+        _id: id,
+        _dr: false
+      }, project);
+
+      for (const pop of populate) {
+        query.populate(pop);
+      }
+
+      const ret = yield query.exec();
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -42,44 +60,55 @@ repo.list =
 function () {
   var _ref2 = _asyncToGenerator(function* (name, mgo, ctx) {
     try {
-      const page = parseInt(ctx.query.page) || 1;
-      const size = parseInt(ctx.query.size) || 20;
-      const range = ctx.query.range === 'ALL' ? ctx.query.range.toUpperCase() : 'PAGE';
-      const cond = utils.toCond(ctx.query.cond);
-      const sort = utils.toSort(ctx.query.sort);
-      const project = utils.toProject(ctx.query.project);
-      const populate = utils.toPopulate(ctx.query.populate);
+      const q = Query(ctx.query);
+      const cond = q.buildCond();
+      const sort = q.buildSort();
+      const project = q.buildProject();
+      const populate = q.buildPopulate();
       let totalpages;
       let totalrecords;
       let data;
       const Model = mgo.model(name);
-      const query = Model.find(cond, project).sort(sort);
-      utils.popModel(query, populate);
+      const query = Model.find(_objectSpread({
+        _dr: false
+      }, cond), project).sort(sort);
 
-      if (range === 'PAGE') {
-        query.skip((page - 1) * size).limit(size);
-        data = yield query.exec();
-        totalrecords = yield Model.where(cond).countDocuments();
-        totalpages = Math.ceil(totalrecords / size);
-      } else if (range === 'ALL') {
-        data = yield query.exec();
-        totalrecords = data.length;
+      for (const pop of populate) {
+        query.populate(pop);
       }
 
-      ctx.status = 200;
-      ctx.body = {
-        cond,
-        page,
-        size,
-        sort,
-        project,
-        populate,
-        totalpages,
-        totalrecords,
-        data
-      };
+      if (q.range === 'PAGE') {
+        query.skip((q.page - 1) * q.size).limit(q.size);
+        data = yield query.exec();
+        totalrecords = yield Model.where(cond).countDocuments();
+        totalpages = Math.ceil(totalrecords / q.size);
+        ctx.status = 200;
+        ctx.body = {
+          cond,
+          page: q.page,
+          size: q.size,
+          sort,
+          project,
+          populate,
+          totalpages,
+          totalrecords,
+          data
+        };
+      } else if (q.range === 'ALL') {
+        data = yield query.exec();
+        totalrecords = data.length;
+        ctx.status = 200;
+        ctx.body = {
+          cond,
+          sort,
+          project,
+          populate,
+          totalrecords,
+          data
+        };
+      }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -97,14 +126,20 @@ repo.create =
 function () {
   var _ref3 = _asyncToGenerator(function* (name, mgo, ctx) {
     try {
-      const data = ctx.request.body;
-      const items = is.array(data) ? data : [data];
+      // eslint-disable-next-line no-unused-vars
+      const {
+        docs,
+        category
+      } = ctx.request.body;
       const Model = mgo.model(name);
-      const ret = yield Model.create(items);
+      const ret = yield Model.create(docs.map(x => _objectSpread({}, x, {
+        _dr: false,
+        _createdAt: moment().unix()
+      })));
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -122,28 +157,32 @@ repo.delete =
 function () {
   var _ref4 = _asyncToGenerator(function* (name, mgo, ctx) {
     try {
+      // eslint-disable-next-line no-unused-vars
       const {
-        cond,
-        doc,
-        muti
+        docs,
+        category
       } = ctx.request.body;
-      let ret;
       const Model = mgo.model(name);
-
-      if (muti) {
-        ret = yield Model.deleteMany(cond, {
-          $set: doc
-        });
-      } else {
-        ret = yield Model.deleteOne(cond, {
-          $set: doc
-        });
-      }
-
+      const ret = yield Model.bulkWrite(docs.map(x => {
+        return {
+          updateOne: {
+            filter: {
+              _id: x._id
+            },
+            update: {
+              $set: {
+                _dr: true,
+                _modifiedAt: moment().unix()
+              }
+            },
+            upsert: false
+          }
+        };
+      }));
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -161,28 +200,32 @@ repo.update =
 function () {
   var _ref5 = _asyncToGenerator(function* (name, mgo, ctx) {
     try {
+      // eslint-disable-next-line no-unused-vars
       const {
-        cond,
-        doc,
-        muti
+        docs,
+        category
       } = ctx.request.body;
-      let ret;
       const Model = mgo.model(name);
-
-      if (muti) {
-        ret = yield Model.updateMany(cond, {
-          $set: doc
-        });
-      } else {
-        ret = yield Model.updateOne(cond, {
-          $set: doc
-        });
-      }
-
+      const ret = yield Model.bulkWrite(docs.map(x => {
+        return {
+          updateOne: {
+            filter: {
+              _id: x._id,
+              _dr: false
+            },
+            update: {
+              $set: _objectSpread({}, x, {
+                _modifiedAt: moment().unix()
+              })
+            },
+            upsert: false
+          }
+        };
+      }));
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       ctx.status = 500;
       ctx.body = {
         message: error.message

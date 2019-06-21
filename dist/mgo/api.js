@@ -153,7 +153,7 @@ repo.Api.prototype.Delete = function (router, name) {
   }
 
   middles.push(h.R);
-  router.put.apply(router, [`/${name}`].concat(middles));
+  router.delete.apply(router, [`/${name}`].concat(middles));
   return h;
 };
 
