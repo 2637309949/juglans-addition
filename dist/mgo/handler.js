@@ -31,6 +31,8 @@ function () {
       const populate = q.buildPopulate();
       const cond = yield routeHooks.one.cond({
         _id: id
+      }, {
+        name
       });
       const query = Model.findOne(cond, project);
 
@@ -75,7 +77,9 @@ function () {
       let data;
       const Model = mongoose.model(name);
       const routeHooks = mongoose.ext.routeHooks(name, defaultAPI);
-      const where = yield routeHooks.list.cond(cond);
+      const where = yield routeHooks.list.cond(cond, {
+        name
+      });
       const query = Model.find(where, project).sort(sort);
 
       for (const pop of populate) {
@@ -142,7 +146,9 @@ function () {
       const {
         docs,
         category
-      } = yield routeHooks.create.body(ctx.request.body);
+      } = yield routeHooks.create.body(ctx.request.body, {
+        name
+      });
       const ret = yield Model.create(docs);
       ctx.status = 200;
       ctx.body = ret;
@@ -177,7 +183,9 @@ function () {
       } = ctx.request.body;
       const Model = mongoose.model(name);
       const routeHooks = mongoose.ext.routeHooks(name, defaultAPI);
-      const update = yield routeHooks.delete.update({});
+      const update = yield routeHooks.delete.update({}, {
+        name
+      });
       const ret = yield Model.bulkWrite(docs.map(x => {
         return {
           updateOne: {
@@ -222,7 +230,9 @@ function () {
       const {
         docs,
         category
-      } = yield routeHooks.update.body(ctx.request.body);
+      } = yield routeHooks.update.body(ctx.request.body, {
+        name
+      });
       const Model = mongoose.model(name);
       const ret = yield Model.bulkWrite(docs.map(x => {
         return {
