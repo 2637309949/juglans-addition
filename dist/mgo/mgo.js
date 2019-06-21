@@ -13,6 +13,8 @@ const merge = require('deepmerge');
 
 const api = require('./api');
 
+const model = require('./model');
+
 const DefaultAPI = require('./plugin');
 
 mongoose.m = [];
@@ -55,4 +57,5 @@ mongoose.Register = function () {
 
 DefaultAPI.mongoose = mongoose;
 mongoose.DefaultAPI = DefaultAPI;
+mongoose.CommonFields = model;
 module.exports = mongoose;
