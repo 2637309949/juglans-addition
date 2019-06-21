@@ -11,20 +11,17 @@ const repo = module.exports;
 
 repo.Hook = function (_ref) {
   let {
-    mgo,
     handler
   } = _ref;
 
   if (!(this instanceof repo.Hook)) {
     return new repo.Hook({
-      mgo,
       handler
     });
   }
 
   this.R = this.route();
   this.handler = handler;
-  this.mgo = mgo;
 }; // Wrap spec model router with pre and post hooks
 
 

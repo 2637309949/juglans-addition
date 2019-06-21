@@ -1,9 +1,5 @@
 "use strict";
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -11,8 +7,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
-const moment = require('moment');
-
 const logger = require('../logger');
 
 const Query = require('./query');
@@ -22,17 +16,23 @@ const repo = module.exports;
 repo.one =
 /*#__PURE__*/
 function () {
-  var _ref = _asyncToGenerator(function* (name, mgo, ctx) {
+  var _ref2 = _asyncToGenerator(function* (name, ctx, _ref) {
+    let {
+      mongoose,
+      defaultAPI
+    } = _ref;
+
     try {
       const id = ctx.params.id;
-      const Model = mgo.model(name);
+      const Model = mongoose.model(name);
+      const routeHooks = mongoose.routeHooks(name, defaultAPI);
       const q = Query(ctx.query);
       const project = q.buildProject();
       const populate = q.buildPopulate();
-      const query = Model.findOne({
-        _id: id,
-        _dr: false
-      }, project);
+      const cond = yield routeHooks.one.cond({
+        _id: id
+      });
+      const query = Model.findOne(cond, project);
 
       for (const pop of populate) {
         query.populate(pop);
@@ -42,7 +42,7 @@ function () {
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
-      logger.error(error);
+      logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -51,14 +51,19 @@ function () {
   });
 
   return function (_x, _x2, _x3) {
-    return _ref.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 }();
 
 repo.list =
 /*#__PURE__*/
 function () {
-  var _ref2 = _asyncToGenerator(function* (name, mgo, ctx) {
+  var _ref4 = _asyncToGenerator(function* (name, ctx, _ref3) {
+    let {
+      mongoose,
+      defaultAPI
+    } = _ref3;
+
     try {
       const q = Query(ctx.query);
       const cond = q.buildCond();
@@ -68,10 +73,10 @@ function () {
       let totalpages;
       let totalrecords;
       let data;
-      const Model = mgo.model(name);
-      const query = Model.find(_objectSpread({
-        _dr: false
-      }, cond), project).sort(sort);
+      const Model = mongoose.model(name);
+      const routeHooks = mongoose.routeHooks(name, defaultAPI);
+      const where = yield routeHooks.list.cond(cond);
+      const query = Model.find(where, project).sort(sort);
 
       for (const pop of populate) {
         query.populate(pop);
@@ -80,7 +85,7 @@ function () {
       if (q.range === 'PAGE') {
         query.skip((q.page - 1) * q.size).limit(q.size);
         data = yield query.exec();
-        totalrecords = yield Model.where(cond).countDocuments();
+        totalrecords = yield Model.where(where).countDocuments();
         totalpages = Math.ceil(totalrecords / q.size);
         ctx.status = 200;
         ctx.body = {
@@ -108,7 +113,7 @@ function () {
         };
       }
     } catch (error) {
-      logger.error(error);
+      logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -117,29 +122,32 @@ function () {
   });
 
   return function (_x4, _x5, _x6) {
-    return _ref2.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 }();
 
 repo.create =
 /*#__PURE__*/
 function () {
-  var _ref3 = _asyncToGenerator(function* (name, mgo, ctx) {
+  var _ref6 = _asyncToGenerator(function* (name, ctx, _ref5) {
+    let {
+      mongoose,
+      defaultAPI
+    } = _ref5;
+
     try {
-      // eslint-disable-next-line no-unused-vars
+      const Model = mongoose.model(name);
+      const routeHooks = mongoose.routeHooks(name, defaultAPI); // eslint-disable-next-line no-unused-vars
+
       const {
         docs,
         category
-      } = ctx.request.body;
-      const Model = mgo.model(name);
-      const ret = yield Model.create(docs.map(x => _objectSpread({}, x, {
-        _dr: false,
-        _createdAt: moment().unix()
-      })));
+      } = yield routeHooks.create.body(ctx.request.body);
+      const ret = yield Model.create(docs);
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
-      logger.error(error);
+      logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -148,21 +156,28 @@ function () {
   });
 
   return function (_x7, _x8, _x9) {
-    return _ref3.apply(this, arguments);
+    return _ref6.apply(this, arguments);
   };
 }();
 
 repo.delete =
 /*#__PURE__*/
 function () {
-  var _ref4 = _asyncToGenerator(function* (name, mgo, ctx) {
+  var _ref8 = _asyncToGenerator(function* (name, ctx, _ref7) {
+    let {
+      mongoose,
+      defaultAPI
+    } = _ref7;
+
     try {
       // eslint-disable-next-line no-unused-vars
       const {
         docs,
         category
       } = ctx.request.body;
-      const Model = mgo.model(name);
+      const Model = mongoose.model(name);
+      const routeHooks = mongoose.routeHooks(name, defaultAPI);
+      const update = yield routeHooks.delete.update({});
       const ret = yield Model.bulkWrite(docs.map(x => {
         return {
           updateOne: {
@@ -170,10 +185,7 @@ function () {
               _id: x._id
             },
             update: {
-              $set: {
-                _dr: true,
-                _modifiedAt: moment().unix()
-              }
+              $set: update
             },
             upsert: false
           }
@@ -182,7 +194,7 @@ function () {
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
-      logger.error(error);
+      logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -191,21 +203,27 @@ function () {
   });
 
   return function (_x10, _x11, _x12) {
-    return _ref4.apply(this, arguments);
+    return _ref8.apply(this, arguments);
   };
 }();
 
 repo.update =
 /*#__PURE__*/
 function () {
-  var _ref5 = _asyncToGenerator(function* (name, mgo, ctx) {
+  var _ref10 = _asyncToGenerator(function* (name, ctx, _ref9) {
+    let {
+      mongoose,
+      defaultAPI
+    } = _ref9;
+
     try {
-      // eslint-disable-next-line no-unused-vars
+      const routeHooks = mongoose.routeHooks(name, defaultAPI); // eslint-disable-next-line no-unused-vars
+
       const {
         docs,
         category
-      } = ctx.request.body;
-      const Model = mgo.model(name);
+      } = yield routeHooks.update.body(ctx.request.body);
+      const Model = mongoose.model(name);
       const ret = yield Model.bulkWrite(docs.map(x => {
         return {
           updateOne: {
@@ -214,9 +232,7 @@ function () {
               _dr: false
             },
             update: {
-              $set: _objectSpread({}, x, {
-                _modifiedAt: moment().unix()
-              })
+              $set: x
             },
             upsert: false
           }
@@ -225,7 +241,7 @@ function () {
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
-      logger.error(error);
+      logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
         message: error.message
@@ -234,6 +250,6 @@ function () {
   });
 
   return function (_x13, _x14, _x15) {
-    return _ref5.apply(this, arguments);
+    return _ref10.apply(this, arguments);
   };
 }();

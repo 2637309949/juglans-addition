@@ -15,32 +15,38 @@ const repo = module.exports;
 
 repo.Api = function (_ref) {
   let {
-    mgo
+    mongoose
   } = _ref;
 
   if (!(this instanceof repo.Api)) {
     return new repo.Api({
-      mgo
+      mongoose
     });
   }
 
-  this.mgo = mgo;
+  this.defaultAPI = null;
+  this.mongoose = mongoose;
+};
+
+repo.Api.prototype.setDefaultAPI = function (defaultAPI) {
+  this.defaultAPI = defaultAPI;
 };
 
 repo.Api.prototype.One = function (router, name) {
+  const _this = this;
+
   function middle(_x) {
     return _middle.apply(this, arguments);
   }
 
   function _middle() {
     _middle = _asyncToGenerator(function* (ctx) {
-      yield handler.one(name, this.mgo, ctx);
+      yield handler.one(name, ctx, _this);
     });
     return _middle.apply(this, arguments);
   }
 
   const h = hook.Hook({
-    mgo: this.mgo,
     handler: middle
   });
 
@@ -54,19 +60,20 @@ repo.Api.prototype.One = function (router, name) {
 };
 
 repo.Api.prototype.List = function (router, name) {
+  const _this = this;
+
   function middle(_x2) {
     return _middle2.apply(this, arguments);
   }
 
   function _middle2() {
     _middle2 = _asyncToGenerator(function* (ctx) {
-      yield handler.list(name, this.mgo, ctx);
+      yield handler.list(name, ctx, _this);
     });
     return _middle2.apply(this, arguments);
   }
 
   const h = hook.Hook({
-    mgo: this.mgo,
     handler: middle
   });
 
@@ -80,19 +87,20 @@ repo.Api.prototype.List = function (router, name) {
 };
 
 repo.Api.prototype.Create = function (router, name) {
+  const _this = this;
+
   function middle(_x3) {
     return _middle3.apply(this, arguments);
   }
 
   function _middle3() {
     _middle3 = _asyncToGenerator(function* (ctx) {
-      yield handler.create(name, this.mgo, ctx);
+      yield handler.create(name, ctx, _this);
     });
     return _middle3.apply(this, arguments);
   }
 
   const h = hook.Hook({
-    mgo: this.mgo,
     handler: middle
   });
 
@@ -106,19 +114,20 @@ repo.Api.prototype.Create = function (router, name) {
 };
 
 repo.Api.prototype.Update = function (router, name) {
+  const _this = this;
+
   function middle(_x4) {
     return _middle4.apply(this, arguments);
   }
 
   function _middle4() {
     _middle4 = _asyncToGenerator(function* (ctx) {
-      yield handler.update(name, this.mgo, ctx);
+      yield handler.update(name, ctx, _this);
     });
     return _middle4.apply(this, arguments);
   }
 
   const h = hook.Hook({
-    mgo: this.mgo,
     handler: middle
   });
 
@@ -132,19 +141,20 @@ repo.Api.prototype.Update = function (router, name) {
 };
 
 repo.Api.prototype.Delete = function (router, name) {
+  const _this = this;
+
   function middle(_x5) {
     return _middle5.apply(this, arguments);
   }
 
   function _middle5() {
     _middle5 = _asyncToGenerator(function* (ctx) {
-      yield handler.delete(name, this.mgo, ctx);
+      yield handler.delete(name, ctx, _this);
     });
     return _middle5.apply(this, arguments);
   }
 
   const h = hook.Hook({
-    mgo: this.mgo,
     handler: middle
   });
 
@@ -158,13 +168,13 @@ repo.Api.prototype.Delete = function (router, name) {
 };
 
 repo.Api.prototype.ALL = function (router, name) {
-  var _this = this;
+  var _this2 = this;
 
   router.get(`/${name}/:id`,
   /*#__PURE__*/
   function () {
     var _ref2 = _asyncToGenerator(function* (ctx) {
-      yield handler.one(name, _this.mgo, ctx);
+      yield handler.one(name, ctx, _this2);
     });
 
     return function (_x6) {
@@ -175,7 +185,7 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref3 = _asyncToGenerator(function* (ctx) {
-      yield handler.list(name, _this.mgo, ctx);
+      yield handler.list(name, ctx, _this2);
     });
 
     return function (_x7) {
@@ -186,7 +196,7 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref4 = _asyncToGenerator(function* (ctx) {
-      yield handler.create(name, _this.mgo, ctx);
+      yield handler.create(name, ctx, _this2);
     });
 
     return function (_x8) {
@@ -197,7 +207,7 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref5 = _asyncToGenerator(function* (ctx) {
-      yield handler.update(name, _this.mgo, ctx);
+      yield handler.update(name, ctx, _this2);
     });
 
     return function (_x9) {
@@ -208,7 +218,7 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref6 = _asyncToGenerator(function* (ctx) {
-      yield handler.delete(name, _this.mgo, ctx);
+      yield handler.delete(name, ctx, _this2);
     });
 
     return function (_x10) {

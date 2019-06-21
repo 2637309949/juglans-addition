@@ -9,14 +9,16 @@ const assert = require('assert');
 
 const is = require('is');
 
-const api = require('./api'); // Model detailed list
+const merge = require('deepmerge');
 
+const api = require('./api');
 
-mongoose.m = []; // Api for model mount
+const DefaultAPI = require('./plugin');
 
+mongoose.m = [];
 mongoose.api = api.Api({
-  mgo: mongoose
-}); // Connect mongo with retry tactics
+  mongoose
+});
 
 mongoose.retryConnect = function (uri, opts, cb) {
   let retryCount = opts.retryCount || 5;
@@ -35,29 +37,22 @@ mongoose.retryConnect = function (uri, opts, cb) {
   };
 
   return retryStrategy();
+};
+
+mongoose.routeHooks = function (name, defaultAPI) {
+  const profile = mongoose.m.find(x => x.name === name);
+  return merge.all([profile.routeHooks || {}, defaultAPI.routeHooks]);
 }; // Register model
 
 
 mongoose.Register = function () {
-  let carte = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  assert.ok(is.string(carte.name), 'name can not be empty!');
-  assert.ok(is.object(carte.schema), 'schema can not be empty!');
-  mongoose.m.push(carte);
-  return mongoose.model(carte.name, carte.schema);
-}; // Export a juglans plugin
-
-
-mongoose.plugin = function (_ref) {
-  let {
-    router,
-    roles
-  } = _ref;
-
-  for (const item of mongoose.m) {
-    if (item.autoHook === true || item.autoHook === undefined) {
-      mongoose.api.ALL(router, item.name);
-    }
-  }
+  let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  assert.ok(is.string(schema.name), 'name can not be empty!');
+  assert.ok(is.object(schema.schema), 'schema can not be empty!');
+  mongoose.m.push(schema);
+  return mongoose.model(schema.name, schema.schema);
 };
 
+DefaultAPI.mongoose = mongoose;
+mongoose.DefaultAPI = DefaultAPI;
 module.exports = mongoose;
