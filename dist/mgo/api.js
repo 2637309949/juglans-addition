@@ -1,9 +1,5 @@
 "use strict";
 
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
@@ -33,21 +29,8 @@ repo.Api.prototype.setDefaultAPI = function (defaultAPI) {
 };
 
 repo.Api.prototype.One = function (router, name) {
-  const _this = this;
-
-  function middle(_x) {
-    return _middle.apply(this, arguments);
-  }
-
-  function _middle() {
-    _middle = _asyncToGenerator(function* (ctx) {
-      yield handler.one(name, ctx, _this);
-    });
-    return _middle.apply(this, arguments);
-  }
-
   const h = hook.Hook({
-    handler: middle
+    handler: ctx => handler.one(name, ctx, this)
   });
 
   for (var _len = arguments.length, middles = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -60,21 +43,8 @@ repo.Api.prototype.One = function (router, name) {
 };
 
 repo.Api.prototype.List = function (router, name) {
-  const _this = this;
-
-  function middle(_x2) {
-    return _middle2.apply(this, arguments);
-  }
-
-  function _middle2() {
-    _middle2 = _asyncToGenerator(function* (ctx) {
-      yield handler.list(name, ctx, _this);
-    });
-    return _middle2.apply(this, arguments);
-  }
-
   const h = hook.Hook({
-    handler: middle
+    handler: ctx => handler.list(name, ctx, this)
   });
 
   for (var _len2 = arguments.length, middles = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
@@ -87,21 +57,8 @@ repo.Api.prototype.List = function (router, name) {
 };
 
 repo.Api.prototype.Create = function (router, name) {
-  const _this = this;
-
-  function middle(_x3) {
-    return _middle3.apply(this, arguments);
-  }
-
-  function _middle3() {
-    _middle3 = _asyncToGenerator(function* (ctx) {
-      yield handler.create(name, ctx, _this);
-    });
-    return _middle3.apply(this, arguments);
-  }
-
   const h = hook.Hook({
-    handler: middle
+    handler: ctx => handler.create(name, ctx, this)
   });
 
   for (var _len3 = arguments.length, middles = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
@@ -114,21 +71,8 @@ repo.Api.prototype.Create = function (router, name) {
 };
 
 repo.Api.prototype.Update = function (router, name) {
-  const _this = this;
-
-  function middle(_x4) {
-    return _middle4.apply(this, arguments);
-  }
-
-  function _middle4() {
-    _middle4 = _asyncToGenerator(function* (ctx) {
-      yield handler.update(name, ctx, _this);
-    });
-    return _middle4.apply(this, arguments);
-  }
-
   const h = hook.Hook({
-    handler: middle
+    handler: ctx => handler.update(name, ctx, this)
   });
 
   for (var _len4 = arguments.length, middles = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
@@ -141,21 +85,8 @@ repo.Api.prototype.Update = function (router, name) {
 };
 
 repo.Api.prototype.Delete = function (router, name) {
-  const _this = this;
-
-  function middle(_x5) {
-    return _middle5.apply(this, arguments);
-  }
-
-  function _middle5() {
-    _middle5 = _asyncToGenerator(function* (ctx) {
-      yield handler.delete(name, ctx, _this);
-    });
-    return _middle5.apply(this, arguments);
-  }
-
   const h = hook.Hook({
-    handler: middle
+    handler: ctx => handler.delete(name, ctx, this)
   });
 
   for (var _len5 = arguments.length, middles = new Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
@@ -168,61 +99,9 @@ repo.Api.prototype.Delete = function (router, name) {
 };
 
 repo.Api.prototype.ALL = function (router, name) {
-  var _this2 = this;
-
-  router.get(`/${name}/:id`,
-  /*#__PURE__*/
-  function () {
-    var _ref2 = _asyncToGenerator(function* (ctx) {
-      yield handler.one(name, ctx, _this2);
-    });
-
-    return function (_x6) {
-      return _ref2.apply(this, arguments);
-    };
-  }());
-  router.get(`/${name}`,
-  /*#__PURE__*/
-  function () {
-    var _ref3 = _asyncToGenerator(function* (ctx) {
-      yield handler.list(name, ctx, _this2);
-    });
-
-    return function (_x7) {
-      return _ref3.apply(this, arguments);
-    };
-  }());
-  router.post(`/${name}`,
-  /*#__PURE__*/
-  function () {
-    var _ref4 = _asyncToGenerator(function* (ctx) {
-      yield handler.create(name, ctx, _this2);
-    });
-
-    return function (_x8) {
-      return _ref4.apply(this, arguments);
-    };
-  }());
-  router.put(`/${name}`,
-  /*#__PURE__*/
-  function () {
-    var _ref5 = _asyncToGenerator(function* (ctx) {
-      yield handler.update(name, ctx, _this2);
-    });
-
-    return function (_x9) {
-      return _ref5.apply(this, arguments);
-    };
-  }());
-  router.delete(`/${name}`,
-  /*#__PURE__*/
-  function () {
-    var _ref6 = _asyncToGenerator(function* (ctx) {
-      yield handler.delete(name, ctx, _this2);
-    });
-
-    return function (_x10) {
-      return _ref6.apply(this, arguments);
-    };
-  }());
+  router.get(`/${name}/:id`, ctx => handler.one(name, ctx, this));
+  router.get(`/${name}`, ctx => handler.list(name, ctx, this));
+  router.post(`/${name}`, ctx => handler.create(name, ctx, this));
+  router.put(`/${name}`, ctx => handler.update(name, ctx, this));
+  router.delete(`/${name}`, ctx => handler.delete(name, ctx, this));
 };

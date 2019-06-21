@@ -46,7 +46,9 @@ DefaultAPI.defaultParams = {
       cond: function () {
         var _ref2 = _asyncToGenerator(function* (_cond) {
           return _objectSpread({}, _cond, {
-            _dr: false
+            _dr: {
+              $ne: true
+            }
           });
         });
 
@@ -59,7 +61,9 @@ DefaultAPI.defaultParams = {
       cond: function () {
         var _ref3 = _asyncToGenerator(function* (_cond2) {
           return _objectSpread({}, _cond2, {
-            _dr: false
+            _dr: {
+              $ne: true
+            }
           });
         });
 
