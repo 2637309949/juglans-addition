@@ -3,7 +3,7 @@ const Juglans = require('../../juglans')
 const mongoose = require('../').mongoose
 const Redis = require('../').Redis
 
-mongoose.retryConnect('mongodb://127.0.0.1:27017/test?authSource=admin', {
+mongoose.ext.retryConnect('mongodb://127.0.0.1:27017/test?authSource=admin', {
   useCreateIndex: true,
   useNewUrlParser: true,
   poolSize: 1000,

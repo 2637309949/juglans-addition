@@ -6,21 +6,21 @@ Provide global convenience tools, such as cross-module references
 ```javascript
 // InitModel
 function InitModel({ router }) {
-  mongoose.Register({
+  mongoose.ext.Register({
     name: 'User',
     displayName: '参数配置',
     schema: defineSchema,
     autoHook: false
   })
-  mongoose.api.List(router, 'User').Pre(async function (ctx) {
+  mongoose.ext.api.List(router, 'User').Pre(async function (ctx) {
     console.log('before')
   }).Post(async function (ctx) {
     console.log('after')
   })
-  mongoose.api.One(router, 'User')
-  mongoose.api.Delete(router, 'User')
-  mongoose.api.Update(router, 'User')
-  mongoose.api.Create(router, 'User')
+  mongoose.ext.api.One(router, 'User')
+  mongoose.ext.api.Delete(router, 'User')
+  mongoose.ext.api.Update(router, 'User')
+  mongoose.ext.api.Create(router, 'User')
 }
 
 // Mount auto model routes

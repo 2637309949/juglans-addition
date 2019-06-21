@@ -17,12 +17,13 @@ const model = require('./model');
 
 const DefaultAPI = require('./plugin');
 
-mongoose.m = [];
-mongoose.api = api.Api({
+mongoose.ext = {};
+mongoose.ext.m = [];
+mongoose.ext.api = api.Api({
   mongoose
 });
 
-mongoose.retryConnect = function (uri, opts, cb) {
+mongoose.ext.retryConnect = function (uri, opts, cb) {
   let retryCount = opts.retryCount || 5;
 
   const retryStrategy = function () {
@@ -41,21 +42,21 @@ mongoose.retryConnect = function (uri, opts, cb) {
   return retryStrategy();
 };
 
-mongoose.routeHooks = function (name, defaultAPI) {
-  const profile = mongoose.m.find(x => x.name === name);
+mongoose.ext.routeHooks = function (name, defaultAPI) {
+  const profile = mongoose.ext.m.find(x => x.name === name);
   return merge.all([profile.routeHooks || {}, defaultAPI.routeHooks]);
 }; // Register model
 
 
-mongoose.Register = function () {
+mongoose.ext.Register = function () {
   let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   assert.ok(is.string(schema.name), 'name can not be empty!');
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
-  mongoose.m.push(schema);
+  mongoose.ext.m.push(schema);
   return mongoose.model(schema.name, schema.schema);
 };
 
 DefaultAPI.mongoose = mongoose;
-mongoose.DefaultAPI = DefaultAPI;
-mongoose.CommonFields = model;
+mongoose.ext.DefaultAPI = DefaultAPI;
+mongoose.ext.CommonFields = model;
 module.exports = mongoose;

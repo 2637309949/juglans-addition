@@ -16,7 +16,7 @@ const hooks = require('./hooks');
 mongoose.hooks = hooks;
 mongoose.hooksUtils = hooksUtils;
 
-mongoose.retryConnect = function (uri, opts, cb) {
+mongoose.ext.retryConnect = function (uri, opts, cb) {
   let retryCount = opts.retryCount || 5;
 
   const retryStrategy = function () {

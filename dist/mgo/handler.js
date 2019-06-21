@@ -25,7 +25,7 @@ function () {
     try {
       const id = ctx.params.id;
       const Model = mongoose.model(name);
-      const routeHooks = mongoose.routeHooks(name, defaultAPI);
+      const routeHooks = mongoose.ext.routeHooks(name, defaultAPI);
       const q = Query(ctx.query);
       const project = q.buildProject();
       const populate = q.buildPopulate();
@@ -74,7 +74,7 @@ function () {
       let totalrecords;
       let data;
       const Model = mongoose.model(name);
-      const routeHooks = mongoose.routeHooks(name, defaultAPI);
+      const routeHooks = mongoose.ext.routeHooks(name, defaultAPI);
       const where = yield routeHooks.list.cond(cond);
       const query = Model.find(where, project).sort(sort);
 
@@ -137,7 +137,7 @@ function () {
 
     try {
       const Model = mongoose.model(name);
-      const routeHooks = mongoose.routeHooks(name, defaultAPI); // eslint-disable-next-line no-unused-vars
+      const routeHooks = mongoose.ext.routeHooks(name, defaultAPI); // eslint-disable-next-line no-unused-vars
 
       const {
         docs,
@@ -176,7 +176,7 @@ function () {
         category
       } = ctx.request.body;
       const Model = mongoose.model(name);
-      const routeHooks = mongoose.routeHooks(name, defaultAPI);
+      const routeHooks = mongoose.ext.routeHooks(name, defaultAPI);
       const update = yield routeHooks.delete.update({});
       const ret = yield Model.bulkWrite(docs.map(x => {
         return {
@@ -217,7 +217,7 @@ function () {
     } = _ref9;
 
     try {
-      const routeHooks = mongoose.routeHooks(name, defaultAPI); // eslint-disable-next-line no-unused-vars
+      const routeHooks = mongoose.ext.routeHooks(name, defaultAPI); // eslint-disable-next-line no-unused-vars
 
       const {
         docs,

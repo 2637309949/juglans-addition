@@ -31,10 +31,10 @@ DefaultAPI.prototype.plugin = function (_ref) {
     router
   } = _ref;
 
-  for (const item of DefaultAPI.mongoose.m) {
+  for (const item of DefaultAPI.mongoose.ext.m) {
     if (item.autoHook === true || item.autoHook === undefined) {
-      DefaultAPI.mongoose.api.setDefaultAPI(this);
-      DefaultAPI.mongoose.api.ALL(router, item.name);
+      DefaultAPI.mongoose.ext.api.setDefaultAPI(this);
+      DefaultAPI.mongoose.ext.api.ALL(router, item.name);
     }
   }
 }; // DefaultAPI defined a common interface api plugin
