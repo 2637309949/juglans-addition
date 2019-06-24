@@ -1,5 +1,9 @@
 "use strict";
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
@@ -99,9 +103,98 @@ repo.Api.prototype.Delete = function (router, name) {
 };
 
 repo.Api.prototype.ALL = function (router, name) {
-  router.get(`/${name}/:id`, ctx => handler.one(name, ctx, this));
-  router.get(`/${name}`, ctx => handler.list(name, ctx, this));
-  router.post(`/${name}`, ctx => handler.create(name, ctx, this));
-  router.put(`/${name}`, ctx => handler.update(name, ctx, this));
-  router.delete(`/${name}`, ctx => handler.delete(name, ctx, this));
+  var _this = this;
+
+  const h = hook.Hook({});
+
+  for (var _len6 = arguments.length, middles = new Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
+    middles[_key6 - 2] = arguments[_key6];
+  }
+
+  router.get.apply(router, [`/${name}/:id`].concat(middles, [
+  /*#__PURE__*/
+  function () {
+    var _ref2 = _asyncToGenerator(function* (ctx) {
+      const h1 = hook.Hook({
+        handler: ctx => handler.one(name, ctx, _this)
+      });
+      h1.Pre(h.pre);
+      h1.Post(h.post);
+      h1.Auth(h.auth);
+      yield h1.R(ctx);
+    });
+
+    return function (_x) {
+      return _ref2.apply(this, arguments);
+    };
+  }()]));
+  router.get.apply(router, [`/${name}`].concat(middles, [
+  /*#__PURE__*/
+  function () {
+    var _ref3 = _asyncToGenerator(function* (ctx) {
+      const h1 = hook.Hook({
+        handler: ctx => handler.list(name, ctx, _this)
+      });
+      h1.Pre(h.pre);
+      h1.Post(h.post);
+      h1.Auth(h.auth);
+      yield h1.R(ctx);
+    });
+
+    return function (_x2) {
+      return _ref3.apply(this, arguments);
+    };
+  }()]));
+  router.post.apply(router, [`/${name}`].concat(middles, [
+  /*#__PURE__*/
+  function () {
+    var _ref4 = _asyncToGenerator(function* (ctx) {
+      const h1 = hook.Hook({
+        handler: ctx => handler.create(name, ctx, _this)
+      });
+      h1.Pre(h.pre);
+      h1.Post(h.post);
+      h1.Auth(h.auth);
+      yield h1.R(ctx);
+    });
+
+    return function (_x3) {
+      return _ref4.apply(this, arguments);
+    };
+  }()]));
+  router.put.apply(router, [`/${name}`].concat(middles, [
+  /*#__PURE__*/
+  function () {
+    var _ref5 = _asyncToGenerator(function* (ctx) {
+      const h1 = hook.Hook({
+        handler: ctx => handler.update(name, ctx, _this)
+      });
+      h1.Pre(h.pre);
+      h1.Post(h.post);
+      h1.Auth(h.auth);
+      yield h1.R(ctx);
+    });
+
+    return function (_x4) {
+      return _ref5.apply(this, arguments);
+    };
+  }()]));
+  router.delete.apply(router, [`/${name}`].concat(middles, [
+  /*#__PURE__*/
+  function () {
+    var _ref6 = _asyncToGenerator(function* (ctx) {
+      const h1 = hook.Hook({
+        handler: ctx => handler.delete(name, ctx, _this)
+      });
+      h1.Pre(h.pre);
+      h1.Post(h.post);
+      h1.Auth(h.auth);
+      yield h1.R(ctx);
+    });
+
+    return function (_x5) {
+      return _ref6.apply(this, arguments);
+    };
+  }()]));
+  return h;
 };

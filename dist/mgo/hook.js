@@ -21,6 +21,9 @@ repo.Hook = function (_ref) {
   }
 
   this.R = this.route();
+  this.pre = null;
+  this.post = null;
+  this.auth = null;
   this.handler = handler;
 }; // Wrap spec model router with pre and post hooks
 
