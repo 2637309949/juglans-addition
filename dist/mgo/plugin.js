@@ -22,7 +22,7 @@ function DefaultAPI() {
     return new DefaultAPI(params);
   }
 
-  params = merge.all([params, DefaultAPI.defaultParams]);
+  params = merge.all([DefaultAPI.defaultParams, params]);
   this.routeHooks = params.routeHooks;
 }
 
