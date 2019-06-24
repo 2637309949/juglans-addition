@@ -9,6 +9,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // license that can be found in the LICENSE file.
 const repo = module.exports;
 
+const authFailed = ctx => {
+  ctx.status = 403;
+  ctx.body = {
+    message: 'Access Denied, you don\'t have permission.'
+  };
+};
+
 repo.Hook = function (_ref) {
   let {
     handler
@@ -45,6 +52,8 @@ repo.Hook.prototype.route = function () {
 
             if (ret) {
               yield _this.handler(ctx);
+            } else {
+              authFailed(ctx);
             }
           } else {
             yield _this.handler(ctx);
