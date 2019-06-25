@@ -15,21 +15,21 @@ const moment = require('moment');
 
 const merge = require('deepmerge');
 
-function DefaultAPI() {
+function API() {
   let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   let ext = arguments.length > 1 ? arguments[1] : undefined;
   ext = ext || this;
 
-  if (!(this instanceof DefaultAPI)) {
-    return new DefaultAPI(opts, ext);
+  if (!(this instanceof API)) {
+    return new API(opts, ext);
   }
 
-  opts = merge.all([DefaultAPI.defaultOpts, opts]);
+  opts = merge.all([API.defaultOpts, opts]);
   this.opts = opts;
   this.ext = ext;
 }
 
-DefaultAPI.prototype.plugin = function (_ref) {
+API.prototype.plugin = function (_ref) {
   let {
     router
   } = _ref;
@@ -43,8 +43,8 @@ DefaultAPI.prototype.plugin = function (_ref) {
 }; // DefaultAPI defined a common interface api plugin
 
 
-DefaultAPI.defaultOpts = {
-  prefix: 'mgo',
+API.defaultOpts = {
+  prefix: 'seq',
   routePrefixs: {
     one: function (name) {
       let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -173,4 +173,4 @@ DefaultAPI.defaultOpts = {
     }
   }
 };
-module.exports = DefaultAPI;
+module.exports = API;

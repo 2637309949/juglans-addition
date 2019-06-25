@@ -3,7 +3,7 @@
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
-const mongoose = require('mongoose');
+const Sequelize = require('sequelize');
 
 const assert = require('assert');
 
@@ -13,19 +13,29 @@ const merge = require('deepmerge');
 
 const api = require('./api');
 
-const model = require('./model');
-
 const API = require('./plugin');
 
-const repo = module.exports;
-repo.mongoose = mongoose;
-repo.Ext = Ext;
+const model = require('./model');
+
+const logger = require('../logger');
+
+const repo = module.exports; // Sequelize export
+
+repo.Sequelize = Sequelize; // Sequelize Ext export
+
+repo.Ext = Ext; // Model
+
 Ext.Model = model; // Connect defined connect func
 
 Ext.Connect = function (uri, opts) {
-  const mgo = mongoose.createConnection(uri, opts);
+  const sequelize = new Sequelize(uri, opts);
+  sequelize.authenticate().then(() => {
+    logger.info('Connection has been established successfully');
+  }).catch(err => {
+    logger.error('Unable to connect to the database:', err);
+  });
   return new Ext({
-    mgo
+    sequelize
   });
 }; // Ext defined for Sequelize ext
 
@@ -33,14 +43,14 @@ Ext.Connect = function (uri, opts) {
 function Ext(_ref) {
   let {
     m,
-    mgo
+    sequelize
   } = _ref;
 
   if (!(this instanceof Ext)) {
     return new Ext({});
   }
 
-  this.mgo = mgo;
+  this.sequelize = sequelize;
   this.m = m || [];
   this.api = api.Api({
     ext: this
@@ -49,9 +59,9 @@ function Ext(_ref) {
 
 
 Ext.prototype.RouteHooks = function (name, api) {
-  const profile = this.Profile(name);
+  const profile = this.m.find(x => x.name === name);
   return merge.all([profile && profile.routeHooks || {}, api && api.routeHooks || {}]);
-}; // Register model
+}; // Register model and return model
 
 
 Ext.prototype.Register = function () {
@@ -59,12 +69,12 @@ Ext.prototype.Register = function () {
   assert.ok(is.string(schema.name), 'name can not be empty!');
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
   this.m.push(schema);
-  return this.mgo.model(schema.name, schema.schema);
+  return this.sequelize.define(schema.name, schema.schema, schema.opts || {});
 }; // shortcut for sequelize model
 
 
 Ext.prototype.Model = function (name) {
-  return this.mgo.model(name);
+  return this.sequelize.model(name);
 }; // shortcut for sequelize profile
 
 

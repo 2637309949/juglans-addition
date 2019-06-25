@@ -32,14 +32,12 @@ function () {
         _id: id
       }, {
         name
-      });
-      const query = Model.findOne(cond, project);
+      }); // const query = Model.findByPk(id)
+      // for (const pop of populate) {
+      //   query.populate(pop)
+      // }
 
-      for (const pop of populate) {
-        query.populate(pop);
-      }
-
-      const ret = yield query.exec();
+      const ret = yield Model.findByPk(id);
       ctx.status = 200;
       ctx.body = ret;
     } catch (error) {
@@ -71,49 +69,59 @@ function () {
       const sort = q.buildSort();
       const project = q.buildProject();
       const populate = q.buildPopulate();
+      const Model = ext.Model(name);
       let totalpages;
       let totalrecords;
       let data;
-      const Model = ext.Model(name);
       const where = yield routeHooks.list.cond(cond, {
         name
       });
-      const query = Model.find(where, project).sort(sort);
+      data = yield Model.findAll();
+      ctx.status = 200;
+      ctx.body = {
+        cond,
+        page: q.page,
+        size: q.size,
+        sort,
+        project,
+        populate,
+        totalpages,
+        totalrecords,
+        data // for (const pop of populate) {
+        //   query.populate(pop)
+        // }
+        // if (q.range === 'PAGE') {
+        //   query.skip((q.page - 1) * q.size).limit(q.size)
+        //   data = await query.exec()
+        //   totalrecords = await Model.where(where).countDocuments()
+        //   totalpages = Math.ceil(totalrecords / q.size)
+        //   ctx.status = 200
+        //   ctx.body = {
+        //     cond,
+        //     page: q.page,
+        //     size: q.size,
+        //     sort,
+        //     project,
+        //     populate,
+        //     totalpages,
+        //     totalrecords,
+        //     data
+        //   }
+        // } else if (q.range === 'ALL') {
+        //   data = await query.exec()
+        //   totalrecords = data.length
+        //   ctx.status = 200
+        //   ctx.body = {
+        //     cond,
+        //     sort,
+        //     project,
+        //     populate,
+        //     totalrecords,
+        //     data
+        //   }
+        // }
 
-      for (const pop of populate) {
-        query.populate(pop);
-      }
-
-      if (q.range === 'PAGE') {
-        query.skip((q.page - 1) * q.size).limit(q.size);
-        data = yield query.exec();
-        totalrecords = yield Model.where(where).countDocuments();
-        totalpages = Math.ceil(totalrecords / q.size);
-        ctx.status = 200;
-        ctx.body = {
-          cond,
-          page: q.page,
-          size: q.size,
-          sort,
-          project,
-          populate,
-          totalpages,
-          totalrecords,
-          data
-        };
-      } else if (q.range === 'ALL') {
-        data = yield query.exec();
-        totalrecords = data.length;
-        ctx.status = 200;
-        ctx.body = {
-          cond,
-          sort,
-          project,
-          populate,
-          totalrecords,
-          data
-        };
-      }
+      };
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -133,12 +141,13 @@ repo.create =
 function () {
   var _ref6 = _asyncToGenerator(function* (name, ctx, _ref5) {
     let {
-      ext,
-      routeHooks
+      mongoose,
+      defaultAPI
     } = _ref5;
 
     try {
-      const Model = ext.Model(name); // eslint-disable-next-line no-unused-vars
+      const Model = mongoose.model(name);
+      const routeHooks = mongoose.ext.routeHooks(name, defaultAPI); // eslint-disable-next-line no-unused-vars
 
       const {
         docs,
@@ -168,8 +177,8 @@ repo.delete =
 function () {
   var _ref8 = _asyncToGenerator(function* (name, ctx, _ref7) {
     let {
-      ext,
-      routeHooks
+      mongoose,
+      defaultAPI
     } = _ref7;
 
     try {
@@ -178,7 +187,8 @@ function () {
         docs,
         category
       } = ctx.request.body;
-      const Model = ext.Model(name);
+      const Model = mongoose.model(name);
+      const routeHooks = mongoose.ext.routeHooks(name, defaultAPI);
       const update = yield routeHooks.delete.update({}, {
         name
       });
@@ -216,19 +226,20 @@ repo.update =
 function () {
   var _ref10 = _asyncToGenerator(function* (name, ctx, _ref9) {
     let {
-      ext,
-      routeHooks
+      mongoose,
+      defaultAPI
     } = _ref9;
 
     try {
-      // eslint-disable-next-line no-unused-vars
+      const routeHooks = mongoose.ext.routeHooks(name, defaultAPI); // eslint-disable-next-line no-unused-vars
+
       const {
         docs,
         category
       } = yield routeHooks.update.body(ctx.request.body, {
         name
       });
-      const Model = ext.Model(name);
+      const Model = mongoose.model(name);
       const ret = yield Model.bulkWrite(docs.map(x => {
         return {
           updateOne: {

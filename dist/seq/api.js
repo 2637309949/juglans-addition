@@ -15,9 +15,9 @@ const merge = require('deepmerge');
 
 const moment = require('moment');
 
-const hook = require('./hook');
-
 const handler = require('./handler');
+
+const hook = require('./hook');
 
 const repo = module.exports;
 
@@ -43,7 +43,8 @@ repo.Api = function (_ref) {
   }
 
   this.ext = ext;
-};
+}; // set plugin for default params
+
 
 repo.Api.prototype.setAPI = function (plugin) {
   this.API = plugin;
@@ -86,7 +87,7 @@ repo.Api.prototype.List = function (router, name) {
   }
 
   middles.push(h.R);
-  router.get.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.get.apply(router, [routePrefixs.list(name, this.opts)].concat(middles));
   return h;
 };
 
@@ -106,7 +107,7 @@ repo.Api.prototype.Create = function (router, name) {
   }
 
   middles.push(h.R);
-  router.post.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.post.apply(router, [routePrefixs.create(name, this.opts)].concat(middles));
   return h;
 };
 
@@ -126,7 +127,7 @@ repo.Api.prototype.Update = function (router, name) {
   }
 
   middles.push(h.R);
-  router.put.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.put.apply(router, [routePrefixs.update(name, this.opts)].concat(middles));
   return h;
 };
 
@@ -146,7 +147,7 @@ repo.Api.prototype.Delete = function (router, name) {
   }
 
   middles.push(h.R);
-  router.delete.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.delete.apply(router, [routePrefixs.delete(name, this.opts)].concat(middles));
   return h;
 };
 
@@ -296,7 +297,7 @@ repo.Api.prototype.ALL = function (router, name) {
 
 
 repo.Api.defaultOpts = {
-  prefix: 'mgo',
+  prefix: 'seq',
   routePrefixs: {
     one: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
