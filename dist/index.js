@@ -7,10 +7,13 @@ const mgo = require('./mgo/mgo');
 
 const seq = require('./seq/seq');
 
-const Redis = require('./redis/redis');
+const redis = require('./redis');
+
+const logger = require('./logger');
 
 module.exports = {
   seq,
   mgo,
-  Redis
+  logger,
+  redis
 };
