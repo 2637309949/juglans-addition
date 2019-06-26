@@ -21,10 +21,10 @@ const hook = require('./hook');
 
 const repo = module.exports;
 
-repo.Api = function (_ref) {
+repo.Api = function (_ref, opts) {
   let {
     ext,
-    API
+    API = {}
   } = _ref;
 
   if (!(this instanceof repo.Api)) {
@@ -36,13 +36,20 @@ repo.Api = function (_ref) {
 
   this.API = API;
 
-  if (this.API) {
-    this.opts = merge.all([repo.Api.defaultOpts, this.API.opts || {}]);
+  if (this.API.opts) {
+    this.opts = merge.all([repo.Api.defaultOpts, this.API.opts, opts]);
   } else {
     this.opts = repo.Api.defaultOpts;
   }
 
   this.ext = ext;
+};
+
+repo.Api.prototype.Name = function (name) {
+  this.opts = merge.all([this.opts, {
+    featurePrefix: name
+  }]);
+  return this;
 }; // set plugin for default params
 
 
@@ -298,51 +305,77 @@ repo.Api.prototype.ALL = function (router, name) {
 
 repo.Api.defaultOpts = {
   prefix: 'seq',
+  featurePrefix: '',
   routePrefixs: {
     one: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}/:id`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}/:id`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}/:id`;
     },
     list: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}`;
     },
     create: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}`;
     },
     update: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}`;
     },
     delete: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}`;
     }
   },
   routeHooks: {

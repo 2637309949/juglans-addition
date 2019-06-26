@@ -24,8 +24,9 @@ const repo = module.exports;
 repo.Api = function (_ref) {
   let {
     ext,
-    API
+    API = {}
   } = _ref;
+  let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!(this instanceof repo.Api)) {
     return new repo.Api({
@@ -36,13 +37,20 @@ repo.Api = function (_ref) {
 
   this.API = API;
 
-  if (this.API) {
-    this.opts = merge.all([repo.Api.defaultOpts, this.API.opts || {}]);
+  if (this.API.opts) {
+    this.opts = merge.all([repo.Api.defaultOpts, this.API.opts, opts]);
   } else {
     this.opts = repo.Api.defaultOpts;
   }
 
   this.ext = ext;
+};
+
+repo.Api.prototype.Name = function (name) {
+  this.opts = merge.all([this.opts, {
+    featurePrefix: name
+  }]);
+  return this;
 };
 
 repo.Api.prototype.setAPI = function (plugin) {
@@ -86,7 +94,7 @@ repo.Api.prototype.List = function (router, name) {
   }
 
   middles.push(h.R);
-  router.get.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.get.apply(router, [routePrefixs.list(name, this.opts)].concat(middles));
   return h;
 };
 
@@ -106,7 +114,7 @@ repo.Api.prototype.Create = function (router, name) {
   }
 
   middles.push(h.R);
-  router.post.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.post.apply(router, [routePrefixs.create(name, this.opts)].concat(middles));
   return h;
 };
 
@@ -126,7 +134,7 @@ repo.Api.prototype.Update = function (router, name) {
   }
 
   middles.push(h.R);
-  router.put.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.put.apply(router, [routePrefixs.update(name, this.opts)].concat(middles));
   return h;
 };
 
@@ -146,7 +154,7 @@ repo.Api.prototype.Delete = function (router, name) {
   }
 
   middles.push(h.R);
-  router.delete.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.delete.apply(router, [routePrefixs.delete(name, this.opts)].concat(middles));
   return h;
 };
 
@@ -297,51 +305,77 @@ repo.Api.prototype.ALL = function (router, name) {
 
 repo.Api.defaultOpts = {
   prefix: 'mgo',
+  featurePrefix: '',
   routePrefixs: {
     one: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}/:id`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}/:id`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}/:id`;
     },
     list: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}`;
     },
     create: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}`;
     },
     update: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}`;
     },
     delete: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      let prefix = '';
 
       if (api.prefix) {
-        return `/${api.prefix}/${name}`;
+        prefix = `${prefix}/${api.prefix}`;
       }
 
-      return `/${name}`;
+      if (api.featurePrefix) {
+        prefix = `${prefix}/${api.featurePrefix}`;
+      }
+
+      return `${prefix}/${name}`;
     }
   },
   routeHooks: {

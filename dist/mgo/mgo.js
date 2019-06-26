@@ -45,6 +45,81 @@ function Ext(_ref) {
   this.api = api.Api({
     ext: this
   });
+  this.apifeature1 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature1'
+  });
+  this.apifeature2 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature2'
+  });
+  this.apifeature3 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature3'
+  });
+  this.apifeature4 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature4'
+  });
+  this.apifeature5 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature5'
+  });
+  this.apifeature6 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature6'
+  });
+  this.apifeature7 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature7'
+  });
+  this.apifeature8 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature8'
+  });
+  this.apifeature9 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature9'
+  });
+  this.apifeature10 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature10'
+  });
+  this.apifeature11 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature11'
+  });
+  this.apifeature12 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature12'
+  });
+  this.apifeature13 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature13'
+  });
+  this.apifeature14 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature14'
+  });
+  this.apifeature15 = api.Api({
+    ext: this
+  }, {
+    featurePrefix: 'feature15'
+  });
 } // merge routeHooks
 
 
