@@ -11,6 +11,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
+const is = require('is');
+
 const merge = require('deepmerge');
 
 const moment = require('moment');
@@ -21,33 +23,51 @@ const hook = require('./hook');
 
 const repo = module.exports;
 
-repo.Api = function (_ref, opts) {
+repo.Api = function (_ref) {
   let {
     ext,
     API = {}
   } = _ref;
+  let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!(this instanceof repo.Api)) {
     return new repo.Api({
       ext,
       API
-    });
-  }
-
-  this.API = API;
-
-  if (this.API.opts) {
-    this.opts = merge.all([repo.Api.defaultOpts, this.API.opts, opts]);
-  } else {
-    this.opts = repo.Api.defaultOpts;
+    }, opts);
   }
 
   this.ext = ext;
+  this.API = API;
+
+  if (is.object(this.API && this.API.opts)) {
+    this.opts = merge.all([repo.Api.defaultOpts, this.API.opts, opts]);
+  } else {
+    this.opts = merge.all([repo.Api.defaultOpts, opts]);
+  }
+};
+
+repo.Api.prototype.Feature = function () {
+  let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+    featurePrefix: '/feature'
+  };
+
+  if (is.string(opts)) {
+    opts = {
+      featurePrefix: `/${opts}`
+    };
+  }
+
+  opts.featurePrefix = `${this.opts.featurePrefix}${opts.featurePrefix}`;
+  return repo.Api({
+    ext: this.ext,
+    API: this.API
+  }, opts);
 };
 
 repo.Api.prototype.Name = function (name) {
   this.opts = merge.all([this.opts, {
-    featurePrefix: name
+    featurePrefix: `/${name}`
   }]);
   return this;
 }; // set plugin for default params
@@ -304,7 +324,7 @@ repo.Api.prototype.ALL = function (router, name) {
 
 
 repo.Api.defaultOpts = {
-  prefix: 'seq',
+  prefix: '/seq',
   featurePrefix: '',
   routePrefixs: {
     one: function (name) {
@@ -312,11 +332,11 @@ repo.Api.defaultOpts = {
       let prefix = '';
 
       if (api.prefix) {
-        prefix = `${prefix}/${api.prefix}`;
+        prefix = `${prefix}${api.prefix}`;
       }
 
       if (api.featurePrefix) {
-        prefix = `${prefix}/${api.featurePrefix}`;
+        prefix = `${prefix}${api.featurePrefix}`;
       }
 
       return `${prefix}/${name}/:id`;
@@ -326,11 +346,11 @@ repo.Api.defaultOpts = {
       let prefix = '';
 
       if (api.prefix) {
-        prefix = `${prefix}/${api.prefix}`;
+        prefix = `${prefix}${api.prefix}`;
       }
 
       if (api.featurePrefix) {
-        prefix = `${prefix}/${api.featurePrefix}`;
+        prefix = `${prefix}${api.featurePrefix}`;
       }
 
       return `${prefix}/${name}`;
@@ -340,11 +360,11 @@ repo.Api.defaultOpts = {
       let prefix = '';
 
       if (api.prefix) {
-        prefix = `${prefix}/${api.prefix}`;
+        prefix = `${prefix}${api.prefix}`;
       }
 
       if (api.featurePrefix) {
-        prefix = `${prefix}/${api.featurePrefix}`;
+        prefix = `${prefix}${api.featurePrefix}`;
       }
 
       return `${prefix}/${name}`;
@@ -354,11 +374,11 @@ repo.Api.defaultOpts = {
       let prefix = '';
 
       if (api.prefix) {
-        prefix = `${prefix}/${api.prefix}`;
+        prefix = `${prefix}${api.prefix}`;
       }
 
       if (api.featurePrefix) {
-        prefix = `${prefix}/${api.featurePrefix}`;
+        prefix = `${prefix}${api.featurePrefix}`;
       }
 
       return `${prefix}/${name}`;
@@ -368,11 +388,11 @@ repo.Api.defaultOpts = {
       let prefix = '';
 
       if (api.prefix) {
-        prefix = `${prefix}/${api.prefix}`;
+        prefix = `${prefix}${api.prefix}`;
       }
 
       if (api.featurePrefix) {
-        prefix = `${prefix}/${api.featurePrefix}`;
+        prefix = `${prefix}${api.featurePrefix}`;
       }
 
       return `${prefix}/${name}`;
