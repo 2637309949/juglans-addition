@@ -12,7 +12,6 @@ repo.mgoExt.setApiOpts({
 })
 ```
 #### use as plugin
-
 ```javascript
 app.PostUse(repo.mgoExt)
 ```
@@ -20,7 +19,6 @@ app.PostUse(repo.mgoExt)
 #### custom default api
 
 ```javascript
-
 const User = mgoExt.Register({
   name: 'User',
   displayName: '参数配置',
@@ -49,6 +47,57 @@ module.exports = function ({ router }) {
 }
 
 ```
+
+### sequelize addition
+
+#### new Connect
+
+```javascript
+// sequelize init
+repo.Sequelize = seq.Sequelize
+repo.SeqExt = seq.Ext.Connect(config.sql.uri, config.sql.opts)
+repo.SeqExt.setApiOpts({
+})
+```
+#### use as plugin
+```javascript
+app.PostUse(repo.SeqExt)
+```
+
+#### custom default api
+
+```javascript
+const User = SeqExt.Register({
+  schema: defineSchema,
+  name: 'user',
+  displayName: '用户',
+  autoHook: false,
+  opts: {}
+})
+
+User.belongsTo(User, {foreignKey: '_creator', as: 'creator'})
+User.belongsTo(User, {foreignKey: '_modifier', as: 'modifier'})
+
+module.exports = ({ router, events: e }) => {
+  // routes: api/v1/mgo/user
+  SeqExt.api.List(router, 'user').Pre(async function (ctx) {
+    console.log('before')
+  }).Post(async function (ctx) {
+    console.log('after')
+  })
+  // routes: api/v1/mgo/feature1/user
+  SeqExt.api.Feature('feature1').List(router, 'user')
+  // routes: api/v1/mgo/feature1/subFeature1/user
+  SeqExt.api.Feature('feature1').Feature('subFeature1').List(router, 'user')
+  // routes: api/v1/mgo/custom/user
+  SeqExt.api.Feature('feature1').Feature('subFeature1').Name('custom').List(router, 'user')
+  SeqExt.api.One(router, 'user')
+  SeqExt.api.Delete(router, 'user')
+  SeqExt.api.Update(router, 'user')
+  SeqExt.api.Create(router, 'user')
+}
+```
+
 ## redis addition
 
 ## MIT License
