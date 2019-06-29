@@ -5,6 +5,8 @@
 // license that can be found in the LICENSE file.
 const is = require('is');
 
+const utils = require('./utils');
+
 function Query(_ref) {
   let {
     cond = '%7B%7D',
@@ -66,23 +68,22 @@ Query.prototype.buildSort = function () {
 };
 
 Query.prototype.buildProject = function () {
-  if (!this.project || !this.project.trim()) return {};
-  return this.project.trim().split(',').filter(x => !!x).map(x => x.trim()).reduce((acc, curr) => {
-    let stat = 1;
-
-    if (curr.startsWith('-')) {
-      curr = curr.substr(1);
-      stat = 0;
-    }
-
-    acc[curr] = stat;
-    return acc;
-  }, {});
+  if (!this.project || !this.project.trim()) return [];
+  return this.project.trim().split(',').filter(x => !!x).map(x => x.trim());
 };
 
-Query.prototype.buildPopulate = function () {
+Query.prototype.buildPopulate = function (model) {
+  const associations = utils.associations(model);
   if (!this.populate || !this.populate.trim()) return [];
-  return this.populate.trim().split(',').filter(x => !!x).map(x => x.trim());
+  let populate = this.populate.trim().split(',').filter(x => !!x).map(x => x.trim());
+  populate = populate.map(x => {
+    const assoc = associations.find(as => as.foreignKey === x);
+    return assoc;
+  }).filter(x => !!x).map(x => ({
+    model: x.model,
+    as: x.as
+  }));
+  return populate;
 };
 
 module.exports = Query;

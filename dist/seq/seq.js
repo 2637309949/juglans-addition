@@ -25,9 +25,36 @@ repo.Sequelize = Sequelize; // Sequelize Ext export
 
 repo.Ext = Ext; // Model
 
-Ext.Model = model; // Connect defined connect func
+Ext.Model = model;
+const Op = Sequelize.Op;
+const operatorsAliases = {
+  $eq: Op.eq,
+  $ne: Op.ne,
+  $gte: Op.gte,
+  $gt: Op.gt,
+  $lte: Op.lte,
+  $lt: Op.lt,
+  $not: Op.not,
+  $in: Op.in,
+  $notIn: Op.notIn,
+  $is: Op.is,
+  $like: Op.like,
+  $notLike: Op.notLike,
+  $iLike: Op.iLike,
+  $notILike: Op.notILike,
+  $regexp: Op.regexp,
+  $and: Op.and,
+  $or: Op.or,
+  $any: Op.any // Connect defined connect func
 
-Ext.Connect = function (uri, opts) {
+};
+
+Ext.Connect = function (uri) {
+  let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  opts = merge.all([{
+    operatorsAliases,
+    paranoid: true
+  }, opts]);
   const sequelize = new Sequelize(uri, opts);
   sequelize.authenticate().then(() => {
     logger.info('Connection has been established successfully');
@@ -66,10 +93,16 @@ Ext.prototype.RouteHooks = function (name, api) {
 
 Ext.prototype.Register = function () {
   let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   assert.ok(is.string(schema.name), 'name can not be empty!');
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
   this.m.push(schema);
-  return this.sequelize.define(schema.name, schema.schema, schema.opts || {});
+  opts = merge.all([{
+    charset: 'utf8',
+    collate: 'utf8_general_ci',
+    paranoid: true
+  }, opts]);
+  return this.sequelize.define(schema.name, schema.schema, opts);
 }; // shortcut for sequelize model
 
 
