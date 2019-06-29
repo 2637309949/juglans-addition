@@ -1,30 +1,52 @@
-# juglans-addition
+## juglans-addition
 
   Provide global convenience tools, such as cross-module references
-## mongoose addition
+### mongoose addition
+
+#### new Connect
 
 ```javascript
-// InitModel
-function InitModel({ router }) {
-  mongoose.ext.Register({
-    name: 'User',
-    displayName: '参数配置',
-    schema: defineSchema,
-    autoHook: false
-  })
-  mongoose.ext.api.List(router, 'User').Pre(async function (ctx) {
+repo.mgoExt = mgo.Ext.Connect(config.mongo.uri, config.mongo.opts)
+repo.mgoExt.setApiOpts({
+  prefix: '/template/mgo'
+})
+```
+#### use as plugin
+
+```javascript
+app.PostUse(repo.mgoExt)
+```
+
+#### custom default api
+
+```javascript
+
+const User = mgoExt.Register({
+  name: 'User',
+  displayName: '参数配置',
+  schema: defineSchema,
+  autoHook: false
+})
+
+module.exports = function ({ router }) {
+  // routes: api/v1/mgo/user
+  mgoExt.api.List(router, 'User').Pre(async function (ctx) {
     console.log('before')
   }).Post(async function (ctx) {
     console.log('after')
   })
-  mongoose.ext.api.One(router, 'User')
-  mongoose.ext.api.Delete(router, 'User')
-  mongoose.ext.api.Update(router, 'User')
-  mongoose.ext.api.Create(router, 'User')
-}
+  // routes: api/v1/mgo/feature1/user
+  mgoExt.api.Feature('feature1').List(router, 'User')
+  // routes: api/v1/mgo/feature1/subFeature1/user
+  mgoExt.api.Feature('feature1').Feature('subFeature1').List(router, 'User')
+  // routes: api/v1/mgo/custom/user
+  mgoExt.api.Feature('feature1').Feature('subFeature1').Name('custom').List(router, 'User')
 
-// Mount auto model routes
-app.PostUse(mongoose.AutoHook)
+  mgoExt.api.One(router, 'User')
+  mgoExt.api.Delete(router, 'User')
+  mgoExt.api.Update(router, 'User')
+  mgoExt.api.Create(router, 'User')
+}
 
 ```
 ## redis addition
