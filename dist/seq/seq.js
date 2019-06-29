@@ -13,8 +13,6 @@ const merge = require('deepmerge');
 
 const api = require('./api');
 
-const API = require('./plugin');
-
 const model = require('./model');
 
 const logger = require('../logger');
@@ -45,16 +43,18 @@ const operatorsAliases = {
   $regexp: Op.regexp,
   $and: Op.and,
   $or: Op.or,
-  $any: Op.any // Connect defined connect func
+  $any: Op.any // defaultOpts for sequelize
+
+};
+Ext.defaultOpts = {
+  operatorsAliases,
+  paranoid: true // Connect defined connect func
 
 };
 
 Ext.Connect = function (uri) {
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  opts = merge.all([{
-    operatorsAliases,
-    paranoid: true
-  }, opts]);
+  opts = merge.all([Ext.defaultOpts, opts]);
   const sequelize = new Sequelize(uri, opts);
   sequelize.authenticate().then(() => {
     logger.info('Connection has been established successfully');
@@ -62,7 +62,8 @@ Ext.Connect = function (uri) {
     logger.error('Unable to connect to the database:', err);
   });
   return new Ext({
-    sequelize
+    sequelize,
+    m: []
   });
 }; // Ext defined for Sequelize ext
 
@@ -82,16 +83,10 @@ function Ext(_ref) {
   this.api = api.Api({
     ext: this
   });
-} // merge routeHooks
+} // Register model and return model
 
 
-Ext.prototype.RouteHooks = function (name, api) {
-  const profile = this.m.find(x => x.name === name);
-  return merge.all([profile && profile.routeHooks || {}, api && api.routeHooks || {}]);
-}; // Register model and return model
-
-
-Ext.prototype.Register = function () {
+repo.Ext.prototype.Register = function () {
   let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   assert.ok(is.string(schema.name), 'name can not be empty!');
@@ -103,17 +98,42 @@ Ext.prototype.Register = function () {
     paranoid: true
   }, opts]);
   return this.sequelize.define(schema.name, schema.schema, opts);
+}; // Register model and return model
+
+
+repo.Ext.prototype.DefineSchema = function () {
+  for (var _len = arguments.length, schema = new Array(_len), _key = 0; _key < _len; _key++) {
+    schema[_key] = arguments[_key];
+  }
+
+  return Object.assign.apply(Object, [{}, model].concat(schema));
 }; // shortcut for sequelize model
 
 
-Ext.prototype.Model = function (name) {
+repo.Ext.prototype.Model = function (name) {
   return this.sequelize.model(name);
 }; // shortcut for sequelize profile
 
 
-Ext.prototype.Profile = function (name) {
+repo.Ext.prototype.Profile = function (name) {
   return this.m.find(x => x.name === name);
-}; // API defined default api list
+}; // set api opts
 
 
-Ext.prototype.API = API;
+repo.Ext.prototype.setApiOpts = function () {
+  let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  this.api.setApiOpts(opts);
+  return this;
+};
+
+repo.Ext.prototype.plugin = function (_ref2) {
+  let {
+    router
+  } = _ref2;
+
+  for (const item of this.m) {
+    if (item.autoHook === true || item.autoHook === undefined) {
+      this.api.ALL(router, item.name);
+    }
+  }
+};

@@ -118,7 +118,7 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: 'Internal Server Error'
       };
     }
   });
@@ -153,7 +153,7 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: 'Internal Server Error'
       };
     }
   });
@@ -201,7 +201,7 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: 'Internal Server Error'
       };
     }
   });
@@ -249,7 +249,7 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: 'Internal Server Error'
       };
     }
   });

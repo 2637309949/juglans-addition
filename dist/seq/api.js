@@ -15,8 +15,6 @@ const is = require('is');
 
 const merge = require('deepmerge');
 
-const moment = require('moment');
-
 const handler = require('./handler');
 
 const hook = require('./hook');
@@ -47,6 +45,12 @@ repo.Api = function (_ref) {
   }
 };
 
+repo.Api.prototype.setApiOpts = function () {
+  let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  this.opts = merge.all([this.opts, opts]);
+  return this;
+};
+
 repo.Api.prototype.Feature = function () {
   let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
     featurePrefix: '/feature'
@@ -70,12 +74,6 @@ repo.Api.prototype.Name = function (name) {
     featurePrefix: `/${name}`
   }]);
   return this;
-}; // set plugin for default params
-
-
-repo.Api.prototype.setAPI = function (plugin) {
-  this.API = plugin;
-  this.opts = merge.all([repo.Api.defaultOpts, this.API.opts]);
 };
 
 repo.Api.prototype.One = function (router, name) {
@@ -179,25 +177,20 @@ repo.Api.prototype.Delete = function (router, name) {
 };
 
 repo.Api.prototype.ALL = function (router, name) {
-  var _this2 = this;
-
-  const _this = this;
+  var _this = this;
 
   const h = hook.Hook({});
+  const routePrefixs = merge.all([this.opts.routePrefixs, this.ext.Profile(name).routePrefixs || {}]);
+  const routeHooks = merge.all([this.opts.routeHooks, this.ext.Profile(name).routeHooks || {}]);
 
   for (var _len6 = arguments.length, middles = new Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
     middles[_key6 - 2] = arguments[_key6];
   }
 
-  router.get.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.one(name, _this.opts);
-  }()].concat(middles, [
+  router.get.apply(router, [routePrefixs.one(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref2 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.one(name, ctx, {
           ext: _this.ext,
@@ -215,15 +208,10 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref2.apply(this, arguments);
     };
   }()]));
-  router.get.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.list(name, _this.opts);
-  }()].concat(middles, [
+  router.get.apply(router, [routePrefixs.list(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref3 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.list(name, ctx, {
           ext: _this.ext,
@@ -241,15 +229,10 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref3.apply(this, arguments);
     };
   }()]));
-  router.post.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.create(name, _this.opts);
-  }()].concat(middles, [
+  router.post.apply(router, [routePrefixs.create(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref4 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.create(name, ctx, {
           ext: _this.ext,
@@ -267,15 +250,10 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref4.apply(this, arguments);
     };
   }()]));
-  router.put.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.update(name, _this.opts);
-  }()].concat(middles, [
+  router.put.apply(router, [routePrefixs.update(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref5 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.update(name, ctx, {
           ext: _this.ext,
@@ -293,15 +271,10 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref5.apply(this, arguments);
     };
   }()]));
-  router.delete.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.delete(name, _this.opts);
-  }()].concat(middles, [
+  router.delete.apply(router, [routePrefixs.delete(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref6 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.delete(name, ctx, {
           ext: _this.ext,
@@ -403,9 +376,7 @@ repo.Api.defaultOpts = {
       cond: function () {
         var _ref7 = _asyncToGenerator(function* (_cond) {
           return _objectSpread({}, _cond, {
-            _dr: {
-              $ne: true
-            }
+            deletedAt: null
           });
         });
 
@@ -418,9 +389,7 @@ repo.Api.defaultOpts = {
       cond: function () {
         var _ref8 = _asyncToGenerator(function* (_cond2) {
           return _objectSpread({}, _cond2, {
-            _dr: {
-              $ne: true
-            }
+            deletedAt: null
           });
         });
 
@@ -433,10 +402,7 @@ repo.Api.defaultOpts = {
       body: function () {
         var _ref9 = _asyncToGenerator(function* (_body) {
           return {
-            docs: _body.docs.map(x => _objectSpread({}, x, {
-              _dr: false,
-              _createdAt: moment().unix()
-            })),
+            docs: _body.docs.map(x => _objectSpread({}, x)),
             category: _body.category
           };
         });
@@ -450,8 +416,7 @@ repo.Api.defaultOpts = {
       update: function () {
         var _ref10 = _asyncToGenerator(function* (set) {
           return _objectSpread({}, set, {
-            _dr: true,
-            _modifiedAt: moment().unix()
+            deletedAt: new Date()
           });
         });
 
@@ -464,10 +429,7 @@ repo.Api.defaultOpts = {
       body: function () {
         var _ref11 = _asyncToGenerator(function* (_body2) {
           return {
-            docs: _body2.docs.map(x => _objectSpread({}, x, {
-              _dr: false,
-              _modifiedAt: moment().unix()
-            })),
+            docs: _body2.docs.map(x => _objectSpread({}, x)),
             category: _body2.category
           };
         });

@@ -9,20 +9,16 @@ const assert = require('assert');
 
 const is = require('is');
 
-const merge = require('deepmerge');
-
 const api = require('./api');
 
 const model = require('./model');
 
-const API = require('./plugin');
-
 const repo = module.exports;
 repo.mongoose = mongoose;
 repo.Ext = Ext;
-Ext.Model = model; // Connect defined connect func
+repo.Ext.Model = model; // Connect defined connect func
 
-Ext.Connect = function (uri, opts) {
+repo.Ext.Connect = function (uri, opts) {
   const mgo = mongoose.createConnection(uri, opts);
   return new Ext({
     mgo
@@ -45,32 +41,52 @@ function Ext(_ref) {
   this.api = api.Api({
     ext: this
   });
-} // merge routeHooks
+} // Register model
 
 
-Ext.prototype.RouteHooks = function (name, api) {
-  const profile = this.Profile(name);
-  return merge.all([profile && profile.routeHooks || {}, api && api.routeHooks || {}]);
-}; // Register model
-
-
-Ext.prototype.Register = function () {
+repo.Ext.prototype.Register = function () {
   let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   assert.ok(is.string(schema.name), 'name can not be empty!');
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
   this.m.push(schema);
   return this.mgo.model(schema.name, schema.schema);
+}; // Register model and return model
+
+
+repo.Ext.prototype.DefineSchema = function () {
+  for (var _len = arguments.length, schema = new Array(_len), _key = 0; _key < _len; _key++) {
+    schema[_key] = arguments[_key];
+  }
+
+  return Object.assign.apply(Object, [{}, model].concat(schema));
 }; // shortcut for sequelize model
 
 
-Ext.prototype.Model = function (name) {
+repo.Ext.prototype.Model = function (name) {
   return this.mgo.model(name);
 }; // shortcut for sequelize profile
 
 
-Ext.prototype.Profile = function (name) {
+repo.Ext.prototype.Profile = function (name) {
   return this.m.find(x => x.name === name);
-}; // API defined default api list
+}; // set api opts
 
 
-Ext.prototype.API = API;
+repo.Ext.prototype.setApiOpts = function () {
+  let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  this.api.setApiOpts(opts);
+  return this;
+}; // plugin for juglans
+
+
+repo.Ext.prototype.plugin = function (_ref2) {
+  let {
+    router
+  } = _ref2;
+
+  for (const item of this.m) {
+    if (item.autoHook === true || item.autoHook === undefined) {
+      this.api.ALL(router, item.name);
+    }
+  }
+};

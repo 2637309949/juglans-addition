@@ -34,7 +34,7 @@ function () {
           id
         }
       };
-      const where = yield routeHooks.list.cond(cond, {
+      cond.where = yield routeHooks.one.cond(cond.where, {
         name
       });
 
@@ -42,19 +42,15 @@ function () {
         cond.attributes = project;
       }
 
-      if (populate.length > 0) {
-        cond.include = populate;
-      }
-
+      cond.include = populate;
       data = yield Model.findOne(cond);
-      console.log(data);
       ctx.status = 200;
       ctx.body = data;
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: 'Internal Server Error'
       };
     }
   });
@@ -74,6 +70,9 @@ function () {
     } = _ref3;
 
     try {
+      let data;
+      let totalpages;
+      let totalrecords;
       const Model = ext.Model(name);
       const q = Query(ctx.query);
       const cond = q.buildCond();
@@ -83,10 +82,7 @@ function () {
       const match = {
         where: cond
       };
-      let totalpages;
-      let totalrecords;
-      let data;
-      const where = yield routeHooks.list.cond(cond, {
+      match.where = yield routeHooks.list.cond(match.where, {
         name
       });
 
@@ -135,7 +131,7 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: 'Internal Server Error'
       };
     }
   });
@@ -196,16 +192,19 @@ function () {
         category
       } = ctx.request.body;
       const Model = ext.Model(name);
-      const update = yield routeHooks.delete.update({}, {
-        name
-      });
       const results = [];
 
       for (const item of docs) {
-        const result = yield Model.destroy({
+        const update = yield routeHooks.delete.update({
+          id: item.id
+        }, {
+          name
+        });
+        const result = yield Model.update(update, {
           where: {
             id: item.id
-          }
+          },
+          fields: Object.keys(update)
         });
         results.push(result);
       }
@@ -216,7 +215,7 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: 'Internal Server Error'
       };
     }
   });
@@ -240,11 +239,10 @@ function () {
       const {
         docs,
         category
-      } = ctx.request.body;
-      const Model = ext.Model(name);
-      const update = yield routeHooks.delete.update({}, {
+      } = yield routeHooks.update.body(ctx.request.body, {
         name
       });
+      const Model = ext.Model(name);
       const results = [];
 
       for (const item of docs) {
@@ -263,7 +261,7 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: 'Internal Server Error'
       };
     }
   });

@@ -1,8 +1,8 @@
 # juglans-addition
 
-Provide global convenience tools, such as cross-module references
-
+  Provide global convenience tools, such as cross-module references
 ## mongoose addition
+
 ```javascript
 // InitModel
 function InitModel({ router }) {

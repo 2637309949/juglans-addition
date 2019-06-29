@@ -47,6 +47,12 @@ repo.Api = function (_ref) {
   }
 };
 
+repo.Api.prototype.setApiOpts = function () {
+  let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  this.opts = merge.all([this.opts, opts]);
+  return this;
+};
+
 repo.Api.prototype.Feature = function () {
   let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
     featurePrefix: '/feature'
@@ -70,11 +76,6 @@ repo.Api.prototype.Name = function (name) {
     featurePrefix: `/${name}`
   }]);
   return this;
-};
-
-repo.Api.prototype.setAPI = function (plugin) {
-  this.API = plugin;
-  this.opts = merge.all([repo.Api.defaultOpts, this.API.opts]);
 };
 
 repo.Api.prototype.One = function (router, name) {
@@ -113,7 +114,6 @@ repo.Api.prototype.List = function (router, name) {
   }
 
   middles.push(h.R);
-  console.log(routePrefixs.list(name, this.opts));
   router.get.apply(router, [routePrefixs.list(name, this.opts)].concat(middles));
   return h;
 };
@@ -179,25 +179,20 @@ repo.Api.prototype.Delete = function (router, name) {
 };
 
 repo.Api.prototype.ALL = function (router, name) {
-  var _this2 = this;
-
-  const _this = this;
+  var _this = this;
 
   const h = hook.Hook({});
+  const routePrefixs = merge.all([this.opts.routePrefixs, this.ext.Profile(name).routePrefixs || {}]);
+  const routeHooks = merge.all([this.opts.routeHooks, this.ext.Profile(name).routeHooks || {}]);
 
   for (var _len6 = arguments.length, middles = new Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
     middles[_key6 - 2] = arguments[_key6];
   }
 
-  router.get.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.one(name, _this.opts);
-  }()].concat(middles, [
+  router.get.apply(router, [routePrefixs.one(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref2 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.one(name, ctx, {
           ext: _this.ext,
@@ -215,15 +210,10 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref2.apply(this, arguments);
     };
   }()]));
-  router.get.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.list(name, _this.opts);
-  }()].concat(middles, [
+  router.get.apply(router, [routePrefixs.list(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref3 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.list(name, ctx, {
           ext: _this.ext,
@@ -241,15 +231,10 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref3.apply(this, arguments);
     };
   }()]));
-  router.post.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.create(name, _this.opts);
-  }()].concat(middles, [
+  router.post.apply(router, [routePrefixs.create(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref4 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.create(name, ctx, {
           ext: _this.ext,
@@ -267,15 +252,10 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref4.apply(this, arguments);
     };
   }()]));
-  router.put.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.update(name, _this.opts);
-  }()].concat(middles, [
+  router.put.apply(router, [routePrefixs.update(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref5 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.update(name, ctx, {
           ext: _this.ext,
@@ -293,15 +273,10 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref5.apply(this, arguments);
     };
   }()]));
-  router.delete.apply(router, [function prefix() {
-    const routePrefixs = merge.all([_this.opts.routePrefixs, _this.ext.Profile(name).routePrefixs || {}]);
-    return routePrefixs.delete(name, _this.opts);
-  }()].concat(middles, [
+  router.delete.apply(router, [routePrefixs.delete(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref6 = _asyncToGenerator(function* (ctx) {
-      const routePrefixs = merge.all([_this2.opts.routePrefixs, _this2.ext.Profile(name).routePrefixs || {}]);
-      const routeHooks = merge.all([_this2.opts.routeHooks, _this2.ext.Profile(name).routeHooks || {}]);
       const h1 = hook.Hook({
         handler: ctx => handler.delete(name, ctx, {
           ext: _this.ext,
