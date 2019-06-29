@@ -9,7 +9,12 @@ const path = require('path');
 
 const winston = require('winston');
 
-const {
+let transports;
+let {
+  JLOG_PATH = '',
+  JLOG_SIZE = 10
+} = process.env;
+let {
   combine,
   timestamp,
   printf,
@@ -23,20 +28,17 @@ const format = combine(colorize(), timestamp(), printf((_ref) => {
   } = _ref;
   return `[${level}]: ${timestamp} ${message}`;
 }));
-const {
-  JLOG_PATH = ''
-} = process.env;
-let transports;
 
 if (JLOG_PATH) {
   fsx.ensureDirSync(JLOG_PATH);
+  JLOG_SIZE = parseInt(JLOG_SIZE);
   transports = [new winston.transports.File({
     filename: path.join(JLOG_PATH, 'error.log'),
     level: 'error',
-    maxsize: 1024 * 5
+    maxsize: 1024 * JLOG_SIZE
   }), new winston.transports.File({
     filename: path.join(JLOG_PATH, 'combined.log'),
-    maxsize: 1024 * 5
+    maxsize: 1024 * JLOG_SIZE
   }), new winston.transports.Console({
     format
   })];
