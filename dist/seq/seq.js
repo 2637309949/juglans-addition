@@ -17,13 +17,10 @@ const model = require('./model');
 
 const logger = require('../logger');
 
-const repo = module.exports; // Sequelize export
-
-repo.Sequelize = Sequelize; // Sequelize Ext export
-
-repo.Ext = Ext; // Model
-
-Ext.Model = model;
+const repo = module.exports;
+repo.Sequelize = Sequelize;
+repo.Ext = Ext;
+repo.Ext.Model = model;
 const Op = Sequelize.Op;
 const operatorsAliases = {
   $eq: Op.eq,
@@ -43,16 +40,14 @@ const operatorsAliases = {
   $regexp: Op.regexp,
   $and: Op.and,
   $or: Op.or,
-  $any: Op.any // defaultOpts for sequelize
-
+  $any: Op.any
 };
-Ext.defaultOpts = {
+repo.Ext.defaultOpts = {
   operatorsAliases,
-  paranoid: true // Connect defined connect func
-
+  paranoid: true
 };
 
-Ext.Connect = function (uri) {
+repo.Ext.Connect = function (uri) {
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   opts = merge.all([Ext.defaultOpts, opts]);
   const sequelize = new Sequelize(uri, opts);

@@ -15,6 +15,8 @@ const is = require('is');
 
 const merge = require('deepmerge');
 
+const _ = require('lodash');
+
 const handler = require('./handler');
 
 const hook = require('./hook');
@@ -23,26 +25,18 @@ const repo = module.exports;
 
 repo.Api = function (_ref) {
   let {
-    ext,
-    API = {}
+    ext
   } = _ref;
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!(this instanceof repo.Api)) {
     return new repo.Api({
-      ext,
-      API
+      ext
     }, opts);
   }
 
   this.ext = ext;
-  this.API = API;
-
-  if (is.object(this.API && this.API.opts)) {
-    this.opts = merge.all([repo.Api.defaultOpts, this.API.opts, opts]);
-  } else {
-    this.opts = merge.all([repo.Api.defaultOpts, opts]);
-  }
+  this.opts = merge.all([repo.Api.defaultOpts, opts]);
 };
 
 repo.Api.prototype.setApiOpts = function () {
@@ -64,8 +58,7 @@ repo.Api.prototype.Feature = function () {
 
   opts.featurePrefix = `${this.opts.featurePrefix}${opts.featurePrefix}`;
   return repo.Api({
-    ext: this.ext,
-    API: this.API
+    ext: this.ext
   }, opts);
 };
 
@@ -77,9 +70,16 @@ repo.Api.prototype.Name = function (name) {
 };
 
 repo.Api.prototype.One = function (router, name) {
-  const routePrefixs = merge.all([this.opts.routePrefixs, this.ext.Profile(name).routePrefixs || {}]);
-  const routeHooks = merge.all([this.opts.routeHooks, this.ext.Profile(name).routeHooks || {}]);
+  const profile = this.ext.Profile(name);
+  const {
+    routePrefixs,
+    routeHooks
+  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = routeHooks.one;
   const h = hook.Hook({
+    pre: optHook.pre,
+    post: optHook.post,
+    auth: optHook.auth,
     handler: ctx => handler.one(name, ctx, {
       ext: this.ext,
       routePrefixs,
@@ -97,9 +97,16 @@ repo.Api.prototype.One = function (router, name) {
 };
 
 repo.Api.prototype.List = function (router, name) {
-  const routePrefixs = merge.all([this.opts.routePrefixs, this.ext.Profile(name).routePrefixs || {}]);
-  const routeHooks = merge.all([this.opts.routeHooks, this.ext.Profile(name).routeHooks || {}]);
+  const profile = this.ext.Profile(name);
+  const {
+    routePrefixs,
+    routeHooks
+  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = routeHooks.list;
   const h = hook.Hook({
+    pre: optHook.pre,
+    post: optHook.post,
+    auth: optHook.auth,
     handler: ctx => handler.list(name, ctx, {
       ext: this.ext,
       routePrefixs,
@@ -117,9 +124,16 @@ repo.Api.prototype.List = function (router, name) {
 };
 
 repo.Api.prototype.Create = function (router, name) {
-  const routePrefixs = merge.all([this.opts.routePrefixs, this.ext.Profile(name).routePrefixs || {}]);
-  const routeHooks = merge.all([this.opts.routeHooks, this.ext.Profile(name).routeHooks || {}]);
+  const profile = this.ext.Profile(name);
+  const {
+    routePrefixs,
+    routeHooks
+  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = routeHooks.create;
   const h = hook.Hook({
+    pre: optHook.pre,
+    post: optHook.post,
+    auth: optHook.auth,
     handler: ctx => handler.create(name, ctx, {
       ext: this.ext,
       routePrefixs,
@@ -137,9 +151,16 @@ repo.Api.prototype.Create = function (router, name) {
 };
 
 repo.Api.prototype.Update = function (router, name) {
-  const routePrefixs = merge.all([this.opts.routePrefixs, this.ext.Profile(name).routePrefixs || {}]);
-  const routeHooks = merge.all([this.opts.routeHooks, this.ext.Profile(name).routeHooks || {}]);
+  const profile = this.ext.Profile(name);
+  const {
+    routePrefixs,
+    routeHooks
+  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = routeHooks.update;
   const h = hook.Hook({
+    pre: optHook.pre,
+    post: optHook.post,
+    auth: optHook.auth,
     handler: ctx => handler.update(name, ctx, {
       ext: this.ext,
       routePrefixs,
@@ -157,9 +178,16 @@ repo.Api.prototype.Update = function (router, name) {
 };
 
 repo.Api.prototype.Delete = function (router, name) {
-  const routePrefixs = merge.all([this.opts.routePrefixs, this.ext.Profile(name).routePrefixs || {}]);
-  const routeHooks = merge.all([this.opts.routeHooks, this.ext.Profile(name).routeHooks || {}]);
+  const profile = this.ext.Profile(name);
+  const {
+    routePrefixs,
+    routeHooks
+  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = routeHooks.delete;
   const h = hook.Hook({
+    pre: optHook.pre,
+    post: optHook.post,
+    auth: optHook.auth,
     handler: ctx => handler.delete(name, ctx, {
       ext: this.ext,
       routePrefixs,
@@ -179,9 +207,12 @@ repo.Api.prototype.Delete = function (router, name) {
 repo.Api.prototype.ALL = function (router, name) {
   var _this = this;
 
+  const profile = this.ext.Profile(name);
+  const {
+    routePrefixs,
+    routeHooks
+  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
   const h = hook.Hook({});
-  const routePrefixs = merge.all([this.opts.routePrefixs, this.ext.Profile(name).routePrefixs || {}]);
-  const routeHooks = merge.all([this.opts.routeHooks, this.ext.Profile(name).routeHooks || {}]);
 
   for (var _len6 = arguments.length, middles = new Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
     middles[_key6 - 2] = arguments[_key6];
@@ -191,7 +222,11 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref2 = _asyncToGenerator(function* (ctx) {
+      const optHook = routeHooks.one;
       const h1 = hook.Hook({
+        pre: optHook.pre,
+        post: optHook.post,
+        auth: optHook.auth,
         handler: ctx => handler.one(name, ctx, {
           ext: _this.ext,
           routePrefixs,
@@ -212,7 +247,11 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref3 = _asyncToGenerator(function* (ctx) {
+      const optHook = routeHooks.list;
       const h1 = hook.Hook({
+        pre: optHook.pre,
+        post: optHook.post,
+        auth: optHook.auth,
         handler: ctx => handler.list(name, ctx, {
           ext: _this.ext,
           routePrefixs,
@@ -233,7 +272,11 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref4 = _asyncToGenerator(function* (ctx) {
+      const optHook = routeHooks.create;
       const h1 = hook.Hook({
+        pre: optHook.pre,
+        post: optHook.post,
+        auth: optHook.auth,
         handler: ctx => handler.create(name, ctx, {
           ext: _this.ext,
           routePrefixs,
@@ -254,7 +297,11 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref5 = _asyncToGenerator(function* (ctx) {
+      const optHook = routeHooks.update;
       const h1 = hook.Hook({
+        pre: optHook.pre,
+        post: optHook.post,
+        auth: optHook.auth,
         handler: ctx => handler.update(name, ctx, {
           ext: _this.ext,
           routePrefixs,
@@ -275,7 +322,11 @@ repo.Api.prototype.ALL = function (router, name) {
   /*#__PURE__*/
   function () {
     var _ref6 = _asyncToGenerator(function* (ctx) {
+      const optHook = routeHooks.delete;
       const h1 = hook.Hook({
+        pre: optHook.pre,
+        post: optHook.post,
+        auth: optHook.auth,
         handler: ctx => handler.delete(name, ctx, {
           ext: _this.ext,
           routePrefixs,

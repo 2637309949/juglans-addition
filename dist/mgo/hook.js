@@ -18,19 +18,25 @@ const authFailed = ctx => {
 
 repo.Hook = function (_ref) {
   let {
-    handler
+    handler,
+    pre,
+    post,
+    auth
   } = _ref;
 
   if (!(this instanceof repo.Hook)) {
     return new repo.Hook({
-      handler
+      handler,
+      pre,
+      post,
+      auth
     });
   }
 
   this.R = this.route();
-  this.pre = null;
-  this.post = null;
-  this.auth = null;
+  this.pre = pre;
+  this.post = post;
+  this.auth = auth;
   this.handler = handler;
 }; // Wrap spec model router with pre and post hooks
 
@@ -74,18 +80,27 @@ repo.Hook.prototype.route = function () {
 
 
 repo.Hook.prototype.Pre = function (pre) {
-  this.pre = pre;
+  if (pre) {
+    this.pre = pre;
+  }
+
   return this;
 }; // Post hook for after exec spec model router
 
 
 repo.Hook.prototype.Post = function (post) {
-  this.post = post;
+  if (post) {
+    this.post = post;
+  }
+
   return this;
 }; // Auth hook for after exec spec model router
 
 
 repo.Hook.prototype.Auth = function (auth) {
-  this.auth = auth;
+  if (auth) {
+    this.auth = auth;
+  }
+
   return this;
 };
