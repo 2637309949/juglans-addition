@@ -100,6 +100,35 @@ module.exports = ({ router, events: e }) => {
 
 ## redis addition
 
+
+### apidoc
+
+#### Install apidoc
+```shell
+npm install apidoc -g
+```
+#### Add ignore to .igonre file
+```txt
+/doc/*
+!/doc/api_data.js
+!/doc/api_project.js
+```
+#### Generate apidoc 
+
+```shell
+apidoc -i ./src/
+```
+	apidoc will generate doc dir and some files in doc dir
+
+#### Use apidoc plugin
+
+```javascript
+// apidoc
+repo.apidoc = apidoc({ prefix: '/docs' })
+repo.apidoc.doc(path.join(__dirname, '../doc'))
+app.Use(repo.apidoc)
+```
+
 ## MIT License
 
 Copyright (c) 2018-2020 Double
