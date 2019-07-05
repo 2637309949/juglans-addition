@@ -11,9 +11,12 @@ const redis = require('./redis');
 
 const logger = require('./logger');
 
+const apidoc = require('./apidoc/apidoc');
+
 module.exports = {
   seq,
   mgo,
   logger,
+  apidoc,
   redis
 };
