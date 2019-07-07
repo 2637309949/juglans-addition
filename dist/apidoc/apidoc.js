@@ -17,17 +17,23 @@ const path = require('path');
 
 function ApiDoc(_ref) {
   let {
-    prefix
+    prefix,
+    mgoExt,
+    seqExt
   } = _ref;
 
   if (!(this instanceof ApiDoc)) {
     return new ApiDoc({
-      prefix
+      prefix,
+      mgoExt,
+      seqExt
     });
   }
 
   assert(prefix, 'prefix is required to serve files');
   this.prefix = prefix;
+  this.mgoExt = mgoExt;
+  this.seqExt = seqExt;
   fsx.copyFile(path.join(__dirname, 'template', 'api_data_backup.js'), path.join(__dirname, 'template', 'api_data.js'));
   fsx.copyFile(path.join(__dirname, 'template', 'api_data_backup.json'), path.join(__dirname, 'template', 'api_data.json'));
   fsx.copyFile(path.join(__dirname, 'template', 'api_data_sys_backup.js'), path.join(__dirname, 'template', 'api_data_sys.js'));
@@ -51,11 +57,18 @@ ApiDoc.prototype.plugin = function (_ref2) {
   var _this = this;
 
   let {
-    httpProxy,
-    mgoExt,
-    seqExt
+    httpProxy
   } = _ref2;
-  const docs = mgoExt.Docs().concat(seqExt.Docs());
+  let docs = [];
+
+  if (this.mgoExt) {
+    docs = docs.concat(this.mgoExt.Docs());
+  }
+
+  if (this.seqExt) {
+    docs = docs.concat(this.seqExt.Docs());
+  }
+
   this.writeSysDoc(docs);
   httpProxy.use(
   /*#__PURE__*/
