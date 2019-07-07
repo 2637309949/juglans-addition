@@ -17,3 +17,8 @@ npm-debug.log
 node_modules
 .history
 .vscode
+
+**/template/api_data_sys.js
+**/template/api_data_sys.json
+**/template/api_data.js
+**/template/api_data.json

@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint --ext .js lib",
-    "build": "babel lib --out-dir dist --copy-files",
+    "build": "babel lib --ignore **/template --out-dir dist --copy-files",
     "release": "push origin master --tags && npm publish",
     "test": "mocha --exit test/**/*.test.js"
   },

@@ -1,5 +1,3 @@
-"use strict";
-
 define({
   "name": "juglans-template",
   "version": "0.1.0",
@@ -16,7 +14,7 @@ define({
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2019-07-05T08:08:21.204Z",
+    "time": "2019-07-07T09:07:18.384Z",
     "url": "http://apidocjs.com",
     "version": "0.17.7"
   }

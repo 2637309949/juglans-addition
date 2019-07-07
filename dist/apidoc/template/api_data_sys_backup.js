@@ -1,5 +1,1 @@
-"use strict";
-
-define({
-  "api": []
-});
+define({ "api": [] });

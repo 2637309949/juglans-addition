@@ -1,5 +1,3 @@
-"use strict";
-
 define({
   "name": "bulrush-template",
   "version": "1.0",

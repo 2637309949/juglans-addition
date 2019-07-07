@@ -1,8 +1,7 @@
-"use strict";
-
 var isArray = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
+
 /**
  * Expose `pathToRegexp`.
  */
@@ -13,27 +12,30 @@ var isArray = Array.isArray || function (arr) {
  *
  * @type {RegExp}
  */
+var PATH_REGEXP = new RegExp([
+  // Match escaped characters that would otherwise appear in future matches.
+  // This allows the user to escape special characters that won't transform.
+  '(\\\\.)',
+  // Match Express-style parameters and un-named parameters with a prefix
+  // and optional suffixes. Matches appear as:
+  //
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
+  // "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
+  '([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?',
+  // Match regexp special characters that are always escaped.
+  '([.+*?=^!:${}()[\\]|\\/])'
+].join('|'), 'g');
 
-
-var PATH_REGEXP = new RegExp([// Match escaped characters that would otherwise appear in future matches.
-// This allows the user to escape special characters that won't transform.
-'(\\\\.)', // Match Express-style parameters and un-named parameters with a prefix
-// and optional suffixes. Matches appear as:
-//
-// "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
-// "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
-'([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?', // Match regexp special characters that are always escaped.
-'([.+*?=^!:${}()[\\]|\\/])'].join('|'), 'g');
 /**
  * Escape the capturing group by escaping special characters and meaning.
  *
  * @param  {String} group
  * @return {String}
  */
-
-function escapeGroup(group) {
+function escapeGroup (group) {
   return group.replace(/([=!:$\/()])/g, '\\$1');
 }
+
 /**
  * Attach the keys as a property of the regexp.
  *
@@ -41,23 +43,21 @@ function escapeGroup(group) {
  * @param  {Array}  keys
  * @return {RegExp}
  */
-
-
-function attachKeys(re, keys) {
+function attachKeys (re, keys) {
   re.keys = keys;
   return re;
 }
+
 /**
  * Get the flags for a regexp from the options.
  *
  * @param  {Object} options
  * @return {String}
  */
-
-
-function flags(options) {
+function flags (options) {
   return options.sensitive ? '' : 'i';
 }
+
 /**
  * Pull out keys from a regexp.
  *
@@ -65,25 +65,24 @@ function flags(options) {
  * @param  {Array}  keys
  * @return {RegExp}
  */
-
-
-function regexpToRegexp(path, keys) {
+function regexpToRegexp (path, keys) {
   // Use a negative lookahead to match only capturing groups.
   var groups = path.source.match(/\((?!\?)/g);
 
   if (groups) {
     for (var i = 0; i < groups.length; i++) {
       keys.push({
-        name: i,
+        name:      i,
         delimiter: null,
-        optional: false,
-        repeat: false
+        optional:  false,
+        repeat:    false
       });
     }
   }
 
   return attachKeys(path, keys);
 }
+
 /**
  * Transform an array into a regexp.
  *
@@ -92,9 +91,7 @@ function regexpToRegexp(path, keys) {
  * @param  {Object} options
  * @return {RegExp}
  */
-
-
-function arrayToRegexp(path, keys, options) {
+function arrayToRegexp (path, keys, options) {
   var parts = [];
 
   for (var i = 0; i < path.length; i++) {
@@ -104,6 +101,7 @@ function arrayToRegexp(path, keys, options) {
   var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
   return attachKeys(regexp, keys);
 }
+
 /**
  * Replace the specific tags with regexp strings.
  *
@@ -111,12 +109,10 @@ function arrayToRegexp(path, keys, options) {
  * @param  {Array}  keys
  * @return {String}
  */
-
-
-function replacePath(path, keys) {
+function replacePath (path, keys) {
   var index = 0;
 
-  function replace(_, escaped, prefix, key, capture, group, suffix, escape) {
+  function replace (_, escaped, prefix, key, capture, group, suffix, escape) {
     if (escaped) {
       return escaped;
     }
@@ -125,15 +121,17 @@ function replacePath(path, keys) {
       return '\\' + escape;
     }
 
-    var repeat = suffix === '+' || suffix === '*';
+    var repeat   = suffix === '+' || suffix === '*';
     var optional = suffix === '?' || suffix === '*';
+
     keys.push({
-      name: key || index++,
+      name:      key || index++,
       delimiter: prefix || '/',
-      optional: optional,
-      repeat: repeat
+      optional:  optional,
+      repeat:    repeat
     });
-    prefix = prefix ? '\\' + prefix : '';
+
+    prefix = prefix ? ('\\' + prefix) : '';
     capture = escapeGroup(capture || group || '[^' + (prefix || '\\/') + ']+?');
 
     if (repeat) {
@@ -142,14 +140,15 @@ function replacePath(path, keys) {
 
     if (optional) {
       return '(?:' + prefix + '(' + capture + '))?';
-    } // Basic parameter support.
+    }
 
-
+    // Basic parameter support.
     return prefix + '(' + capture + ')';
   }
 
   return path.replace(PATH_REGEXP, replace);
 }
+
 /**
  * Normalize the given path string, returning a regular expression.
  *
@@ -162,9 +161,7 @@ function replacePath(path, keys) {
  * @param  {Object}                [options]
  * @return {RegExp}
  */
-
-
-function pathToRegexp(path, keys, options) {
+function pathToRegexp (path, keys, options) {
   keys = keys || [];
 
   if (!isArray(keys)) {
@@ -185,11 +182,12 @@ function pathToRegexp(path, keys, options) {
   var strict = options.strict;
   var end = options.end !== false;
   var route = replacePath(path, keys);
-  var endsWithSlash = path.charAt(path.length - 1) === '/'; // In non-strict mode we allow a slash at the end of match. If the path to
+  var endsWithSlash = path.charAt(path.length - 1) === '/';
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
   // match already ends with a slash, we remove it for consistency. The slash
   // is valid at the end of a path match, not in the middle. This is important
   // in non-ending mode, where "/test/" shouldn't match "/test//route".
-
   if (!strict) {
     route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
   }
