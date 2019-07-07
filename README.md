@@ -1,3 +1,26 @@
+## Directory
+
+<!-- TOC -->
+
+- [Directory](#directory)
+- [juglans-addition](#juglans-addition)
+    - [mongoose addition](#mongoose-addition)
+        - [new Connect](#new-connect)
+        - [use as plugin](#use-as-plugin)
+        - [custom default api](#custom-default-api)
+    - [sequelize addition](#sequelize-addition)
+        - [new Connect](#new-connect-1)
+        - [use as plugin](#use-as-plugin-1)
+        - [custom default api](#custom-default-api-1)
+    - [redis addition](#redis-addition)
+    - [apidoc](#apidoc)
+        - [Install apidoc](#install-apidoc)
+        - [Add ignore to .igonre file](#add-ignore-to-igonre-file)
+        - [Generate apidoc](#generate-apidoc)
+        - [Use apidoc plugin](#use-apidoc-plugin)
+    - [MIT License](#mit-license)
+
+<!-- /TOC -->
 ## juglans-addition
 
   Provide global convenience tools, such as cross-module references
@@ -98,8 +121,7 @@ module.exports = ({ router, events: e }) => {
 }
 ```
 
-## redis addition
-
+### redis addition
 
 ### apidoc
 
@@ -129,7 +151,7 @@ repo.apidoc.doc(path.join(__dirname, '../doc'))
 app.Use(repo.apidoc)
 ```
 
-## MIT License
+### MIT License
 
 Copyright (c) 2018-2020 Double
 
