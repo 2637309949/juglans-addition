@@ -42,12 +42,21 @@ ApiDoc.prototype.doc = function (dir) {
   return this;
 };
 
+ApiDoc.prototype.writeSysDoc = function (docs) {
+  const apilist = `define({ "api": ${JSON.stringify(docs)} })`;
+  fsx.writeFileSync(path.join(__dirname, 'template', 'api_data_sys.js'), apilist);
+};
+
 ApiDoc.prototype.plugin = function (_ref2) {
   var _this = this;
 
   let {
-    httpProxy
+    httpProxy,
+    mgoExt,
+    seqExt
   } = _ref2;
+  const docs = mgoExt.Docs().concat(seqExt.Docs());
+  this.writeSysDoc(docs);
   httpProxy.use(
   /*#__PURE__*/
   function () {

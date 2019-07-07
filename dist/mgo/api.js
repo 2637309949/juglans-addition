@@ -17,6 +17,8 @@ const merge = require('deepmerge');
 
 const moment = require('moment');
 
+const doc = require('./doc');
+
 const _ = require('lodash');
 
 const hook = require('./hook');
@@ -95,6 +97,12 @@ repo.Api.prototype.One = function (router, name) {
 
   middles.push(h.R);
   router.get.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  profile.docs = profile.docs.concat(doc.GenDoc({
+    profile,
+    routePrefixs,
+    opts: this.opts,
+    apis: ['one']
+  }));
   return h;
 };
 
@@ -122,6 +130,12 @@ repo.Api.prototype.List = function (router, name) {
 
   middles.push(h.R);
   router.get.apply(router, [routePrefixs.list(name, this.opts)].concat(middles));
+  profile.docs = profile.docs.concat(doc.GenDoc({
+    profile,
+    routePrefixs,
+    opts: this.opts,
+    apis: ['list']
+  }));
   return h;
 };
 
@@ -149,6 +163,12 @@ repo.Api.prototype.Create = function (router, name) {
 
   middles.push(h.R);
   router.post.apply(router, [routePrefixs.create(name, this.opts)].concat(middles));
+  profile.docs = profile.docs.concat(doc.GenDoc({
+    profile,
+    routePrefixs,
+    opts: this.opts,
+    apis: ['create']
+  }));
   return h;
 };
 
@@ -176,6 +196,12 @@ repo.Api.prototype.Update = function (router, name) {
 
   middles.push(h.R);
   router.put.apply(router, [routePrefixs.update(name, this.opts)].concat(middles));
+  profile.docs = profile.docs.concat(doc.GenDoc({
+    profile,
+    routePrefixs,
+    opts: this.opts,
+    apis: ['update']
+  }));
   return h;
 };
 
@@ -203,6 +229,12 @@ repo.Api.prototype.Delete = function (router, name) {
 
   middles.push(h.R);
   router.delete.apply(router, [routePrefixs.delete(name, this.opts)].concat(middles));
+  profile.docs = profile.docs.concat(doc.GenDoc({
+    profile,
+    routePrefixs,
+    opts: this.opts,
+    apis: ['delete']
+  }));
   return h;
 };
 
@@ -345,6 +377,12 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref6.apply(this, arguments);
     };
   }()]));
+  profile.docs = profile.docs.concat(doc.GenDoc({
+    profile,
+    routePrefixs,
+    opts: this.opts,
+    apis: ['one', 'list', 'create', 'update', 'delete']
+  }));
   return h;
 }; // default params
 

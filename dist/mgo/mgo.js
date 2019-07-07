@@ -9,6 +9,8 @@ const assert = require('assert');
 
 const is = require('is');
 
+const _ = require('lodash');
+
 const api = require('./api');
 
 const model = require('./model');
@@ -44,10 +46,16 @@ function Ext(_ref) {
 } // Register model
 
 
+repo.Ext.prototype.Docs = function () {
+  return _.flatMap(this.m, x => x.docs);
+}; // Register model
+
+
 repo.Ext.prototype.Register = function () {
   let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   assert.ok(is.string(schema.name), 'name can not be empty!');
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
+  schema.docs = [];
   this.m.push(schema);
   return this.mgo.model(schema.name, schema.schema);
 }; // Register model and return model
@@ -89,4 +97,8 @@ repo.Ext.prototype.plugin = function (_ref2) {
       this.api.ALL(router, item.name);
     }
   }
+
+  return {
+    mgoExt: this
+  };
 };

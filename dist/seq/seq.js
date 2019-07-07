@@ -11,6 +11,8 @@ const is = require('is');
 
 const merge = require('deepmerge');
 
+const _ = require('lodash');
+
 const api = require('./api');
 
 const model = require('./model');
@@ -78,7 +80,12 @@ function Ext(_ref) {
   this.api = api.Api({
     ext: this
   });
-} // Register model and return model
+} // Register model
+
+
+repo.Ext.prototype.Docs = function () {
+  return _.flatMap(this.m, x => x.docs);
+}; // Register model and return model
 
 
 repo.Ext.prototype.Register = function () {
@@ -86,6 +93,7 @@ repo.Ext.prototype.Register = function () {
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   assert.ok(is.string(schema.name), 'name can not be empty!');
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
+  schema.docs = [];
   this.m.push(schema);
   opts = merge.all([{
     charset: 'utf8',
@@ -131,4 +139,8 @@ repo.Ext.prototype.plugin = function (_ref2) {
       this.api.ALL(router, item.name);
     }
   }
+
+  return {
+    seqExt: this
+  };
 };
