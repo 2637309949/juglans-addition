@@ -18,14 +18,15 @@
         - [Add ignore to .igonre file](#add-ignore-to-igonre-file)
         - [Generate apidoc](#generate-apidoc)
         - [Use apidoc plugin](#use-apidoc-plugin)
-    - [MIT License](#mit-license)
+- [MIT License](#mit-license)
 
 <!-- /TOC -->
 ## juglans-addition
 
-  Provide global convenience tools, such as cross-module references
+        Addtion is the core of the whole structure, not only facilitate the plug-in functionality, but also provide multiple systems to form a unity, engineering is key for the system, such as the unified database access once, log form, document, etc.
 ### mongoose addition
 
+    mgoext provide model Registered, mongoose and configuration of the default api
 #### new Connect
 
 ```javascript
@@ -151,7 +152,7 @@ repo.apidoc.doc(path.join(__dirname, '../doc'))
 app.Use(repo.apidoc)
 ```
 
-### MIT License
+## MIT License
 
 Copyright (c) 2018-2020 Double
 
