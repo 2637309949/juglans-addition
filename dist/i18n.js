@@ -49,7 +49,12 @@ I18N.prototype.plugin = function (_ref) {
   /*#__PURE__*/
   function () {
     var _ref2 = _asyncToGenerator(function* (ctx, next) {
-      _this.locale = yield _this.opts.ctxLocale(ctx);
+      const locale = yield _this.opts.ctxLocale(ctx);
+
+      if (locale) {
+        _this.locale = locale;
+      }
+
       yield next();
     });
 
@@ -79,7 +84,11 @@ I18N.prototype.plugin = function (_ref) {
       return _ref4.apply(this, arguments);
     };
   }());
-  events.on(EVENTS.SYS_JUGLANS_I18N_INIT, message => this.opts.initFunc());
+  events.on(EVENTS.SYS_JUGLANS_I18N_INIT, message => {
+    if (this.opts.initFunc) {
+      return this.opts.initFunc();
+    }
+  });
   return {
     i18n: this
   };
