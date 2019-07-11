@@ -13,6 +13,11 @@ const assert = require('assert');
 
 const deepmerge = require('deepmerge');
 
+const SYS_JUGLANS_I18N_INIT = 'SYS_JUGLANS_I18N_INIT';
+const EVENTS = {
+  [SYS_JUGLANS_I18N_INIT]: SYS_JUGLANS_I18N_INIT
+};
+
 function I18N() {
   let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -20,18 +25,8 @@ function I18N() {
     return new I18N(opts);
   }
 
-  this.locales = {
-    'zh_CN': {
-      'sys_hello': '你好'
-    },
-    'en_US': {
-      'sys_hello': 'hello'
-    },
-    'zh_TW': {
-      'sys_hello': '妳好'
-    }
-  };
   this.locale = 'zh_CN';
+  this.locales = I18N.defaultLocales;
   this.opts = deepmerge.all([I18N.defaultOpts, opts]);
 }
 
@@ -46,7 +41,8 @@ I18N.prototype.plugin = function (_ref) {
 
   let {
     router,
-    httpProxy
+    httpProxy,
+    events
   } = _ref;
   const prefix = this.opts.prefix;
   httpProxy.use(
@@ -65,7 +61,7 @@ I18N.prototype.plugin = function (_ref) {
   /*#__PURE__*/
   function () {
     var _ref3 = _asyncToGenerator(function* (ctx) {
-      ctx.body = _this.locales;
+      return ctx.body = _this.locales;
     });
 
     return function (_x3) {
@@ -76,13 +72,14 @@ I18N.prototype.plugin = function (_ref) {
   /*#__PURE__*/
   function () {
     var _ref4 = _asyncToGenerator(function* (ctx) {
-      ctx.body = _this.locales[ctx.params.locale];
+      return ctx.body = _this.locales[ctx.params.locale];
     });
 
     return function (_x4) {
       return _ref4.apply(this, arguments);
     };
   }());
+  events.on(EVENTS.SYS_JUGLANS_I18N_INIT, message => this.opts.initFunc());
   return {
     i18n: this
   };
@@ -92,9 +89,9 @@ I18N.prototype.initLocal =
 /*#__PURE__*/
 function () {
   var _ref5 = _asyncToGenerator(function* (func) {
-    assert.ok(is.function(func), 'must provide func');
+    assert.ok(is.function(func), 'params must be func');
     const initFunc = yield func(this);
-    assert.ok(is.function(initFunc), 'must return func');
+    assert.ok(is.function(initFunc), 'ret must be func');
     this.opts.initFunc = initFunc;
     return this;
   });
@@ -136,5 +133,16 @@ I18N.defaultOpts = {
     })();
   }
 
+};
+I18N.defaultLocales = {
+  'zh_CN': {
+    'sys_hello': '你好'
+  },
+  'en_US': {
+    'sys_hello': 'hello'
+  },
+  'zh_TW': {
+    'sys_hello': '妳好'
+  }
 };
 module.exports = I18N;
