@@ -83,7 +83,9 @@ I18N.prototype.plugin = function (_ref) {
       return _ref4.apply(this, arguments);
     };
   }());
-  return this;
+  return {
+    i18n: this
+  };
 };
 
 I18N.prototype.initLocal =
