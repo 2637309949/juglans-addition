@@ -45,7 +45,6 @@ function titleCase(str) {
 repo.GenDoc = function (_ref) {
   let {
     profile,
-    routePrefixs,
     opts,
     apis = []
   } = _ref;
@@ -55,7 +54,7 @@ repo.GenDoc = function (_ref) {
     if (api === 'one') {
       docs.push({
         'type': 'get',
-        'url': routePrefixs.one(profile.name, opts),
+        'url': opts.routePrefixs.one(profile.name, opts),
         'title': `${profile.name} one`,
         'name': `${profile.name} one`,
         'group': 'Nosql',
@@ -70,7 +69,7 @@ repo.GenDoc = function (_ref) {
     } else if (api === 'list') {
       docs.push({
         'type': 'get',
-        'url': routePrefixs.list(profile.name, opts),
+        'url': opts.routePrefixs.list(profile.name, opts),
         'title': `${profile.name} list`,
         'name': `${profile.name} list`,
         'group': 'Nosql',
@@ -85,7 +84,7 @@ repo.GenDoc = function (_ref) {
     } else if (api === 'create') {
       docs.push({
         'type': 'post',
-        'url': routePrefixs.create(profile.name, opts),
+        'url': opts.routePrefixs.create(profile.name, opts),
         'title': `${profile.name} create`,
         'name': `${profile.name} create`,
         'group': 'Nosql',
@@ -100,7 +99,7 @@ repo.GenDoc = function (_ref) {
     } else if (api === 'update') {
       docs.push({
         'type': 'put',
-        'url': routePrefixs.update(profile.name, opts),
+        'url': opts.routePrefixs.update(profile.name, opts),
         'title': `${profile.name} update`,
         'name': `${profile.name} update`,
         'group': 'Nosql',
@@ -115,7 +114,7 @@ repo.GenDoc = function (_ref) {
     } else if (api === 'delete') {
       docs.push({
         'type': 'delete',
-        'url': routePrefixs.delete(profile.name, opts),
+        'url': opts.routePrefixs.delete(profile.name, opts),
         'title': `${profile.name} delete`,
         'name': `${profile.name} delete`,
         'group': 'Nosql',

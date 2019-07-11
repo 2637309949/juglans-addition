@@ -15,8 +15,6 @@ const is = require('is');
 
 const merge = require('deepmerge');
 
-const moment = require('moment');
-
 const doc = require('./doc');
 
 const _ = require('lodash');
@@ -75,20 +73,13 @@ repo.Api.prototype.Name = function (name) {
 
 repo.Api.prototype.One = function (router, name) {
   const profile = this.ext.Profile(name);
-  const {
-    routePrefixs,
-    routeHooks
-  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
-  const optHook = routeHooks.one;
+  const opts = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = opts.routeHooks.one;
   const h = hook.Hook({
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
-    handler: ctx => handler.one(name, ctx, {
-      ext: this.ext,
-      routePrefixs,
-      routeHooks
-    })
+    handler: ctx => handler.one(name, ctx, this.ext, opts)
   });
 
   for (var _len = arguments.length, middles = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -96,11 +87,10 @@ repo.Api.prototype.One = function (router, name) {
   }
 
   middles.push(h.R);
-  router.get.apply(router, [routePrefixs.one(name, this.opts)].concat(middles));
+  router.get.apply(router, [opts.routePrefixs.one(name, opts)].concat(middles));
   profile.docs = profile.docs.concat(doc.GenDoc({
     profile,
-    routePrefixs,
-    opts: this.opts,
+    opts,
     apis: ['one']
   }));
   return h;
@@ -108,20 +98,13 @@ repo.Api.prototype.One = function (router, name) {
 
 repo.Api.prototype.List = function (router, name) {
   const profile = this.ext.Profile(name);
-  const {
-    routePrefixs,
-    routeHooks
-  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
-  const optHook = routeHooks.list;
+  const opts = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = opts.routeHooks.list;
   const h = hook.Hook({
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
-    handler: ctx => handler.list(name, ctx, {
-      ext: this.ext,
-      routePrefixs,
-      routeHooks
-    })
+    handler: ctx => handler.list(name, ctx, this.ext, opts)
   });
 
   for (var _len2 = arguments.length, middles = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
@@ -129,11 +112,10 @@ repo.Api.prototype.List = function (router, name) {
   }
 
   middles.push(h.R);
-  router.get.apply(router, [routePrefixs.list(name, this.opts)].concat(middles));
+  router.get.apply(router, [opts.routePrefixs.list(name, opts)].concat(middles));
   profile.docs = profile.docs.concat(doc.GenDoc({
     profile,
-    routePrefixs,
-    opts: this.opts,
+    opts,
     apis: ['list']
   }));
   return h;
@@ -141,20 +123,13 @@ repo.Api.prototype.List = function (router, name) {
 
 repo.Api.prototype.Create = function (router, name) {
   const profile = this.ext.Profile(name);
-  const {
-    routePrefixs,
-    routeHooks
-  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
-  const optHook = routeHooks.create;
+  const opts = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = opts.routeHooks.create;
   const h = hook.Hook({
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
-    handler: ctx => handler.create(name, ctx, {
-      ext: this.ext,
-      routePrefixs,
-      routeHooks
-    })
+    handler: ctx => handler.create(name, ctx, this.ext, opts)
   });
 
   for (var _len3 = arguments.length, middles = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
@@ -162,11 +137,10 @@ repo.Api.prototype.Create = function (router, name) {
   }
 
   middles.push(h.R);
-  router.post.apply(router, [routePrefixs.create(name, this.opts)].concat(middles));
+  router.post.apply(router, [opts.routePrefixs.create(name, opts)].concat(middles));
   profile.docs = profile.docs.concat(doc.GenDoc({
     profile,
-    routePrefixs,
-    opts: this.opts,
+    opts,
     apis: ['create']
   }));
   return h;
@@ -174,20 +148,13 @@ repo.Api.prototype.Create = function (router, name) {
 
 repo.Api.prototype.Update = function (router, name) {
   const profile = this.ext.Profile(name);
-  const {
-    routePrefixs,
-    routeHooks
-  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
-  const optHook = routeHooks.update;
+  const opts = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = opts.routeHooks.update;
   const h = hook.Hook({
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
-    handler: ctx => handler.update(name, ctx, {
-      ext: this.ext,
-      routePrefixs,
-      routeHooks
-    })
+    handler: ctx => handler.update(name, ctx, this.ext, opts)
   });
 
   for (var _len4 = arguments.length, middles = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
@@ -195,11 +162,10 @@ repo.Api.prototype.Update = function (router, name) {
   }
 
   middles.push(h.R);
-  router.put.apply(router, [routePrefixs.update(name, this.opts)].concat(middles));
+  router.put.apply(router, [opts.routePrefixs.update(name, opts)].concat(middles));
   profile.docs = profile.docs.concat(doc.GenDoc({
     profile,
-    routePrefixs,
-    opts: this.opts,
+    opts,
     apis: ['update']
   }));
   return h;
@@ -207,20 +173,13 @@ repo.Api.prototype.Update = function (router, name) {
 
 repo.Api.prototype.Delete = function (router, name) {
   const profile = this.ext.Profile(name);
-  const {
-    routePrefixs,
-    routeHooks
-  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
-  const optHook = routeHooks.delete;
+  const opts = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const optHook = opts.routeHooks.delete;
   const h = hook.Hook({
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
-    handler: ctx => handler.delete(name, ctx, {
-      ext: this.ext,
-      routePrefixs,
-      routeHooks
-    })
+    handler: ctx => handler.delete(name, ctx, this.ext, opts)
   });
 
   for (var _len5 = arguments.length, middles = new Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
@@ -228,11 +187,10 @@ repo.Api.prototype.Delete = function (router, name) {
   }
 
   middles.push(h.R);
-  router.delete.apply(router, [routePrefixs.delete(name, this.opts)].concat(middles));
+  router.delete.apply(router, [opts.routePrefixs.delete(name, opts)].concat(middles));
   profile.docs = profile.docs.concat(doc.GenDoc({
     profile,
-    routePrefixs,
-    opts: this.opts,
+    opts,
     apis: ['delete']
   }));
   return h;
@@ -242,30 +200,23 @@ repo.Api.prototype.ALL = function (router, name) {
   var _this = this;
 
   const profile = this.ext.Profile(name);
-  const {
-    routePrefixs,
-    routeHooks
-  } = merge.all([this.opts, _.get(profile, 'opts', {})]);
+  const opts = merge.all([this.opts, _.get(profile, 'opts', {})]);
   const h = hook.Hook({});
 
   for (var _len6 = arguments.length, middles = new Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
     middles[_key6 - 2] = arguments[_key6];
   }
 
-  router.get.apply(router, [routePrefixs.one(name, this.opts)].concat(middles, [
+  router.get.apply(router, [opts.routePrefixs.one(name, opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref2 = _asyncToGenerator(function* (ctx) {
-      const optHook = routeHooks.one;
+      const optHook = opts.routeHooks.one;
       const h1 = hook.Hook({
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
-        handler: ctx => handler.one(name, ctx, {
-          ext: _this.ext,
-          routePrefixs,
-          routeHooks
-        })
+        handler: ctx => handler.one(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -277,20 +228,16 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref2.apply(this, arguments);
     };
   }()]));
-  router.get.apply(router, [routePrefixs.list(name, this.opts)].concat(middles, [
+  router.get.apply(router, [opts.routePrefixs.list(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref3 = _asyncToGenerator(function* (ctx) {
-      const optHook = routeHooks.list;
+      const optHook = opts.routeHooks.list;
       const h1 = hook.Hook({
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
-        handler: ctx => handler.list(name, ctx, {
-          ext: _this.ext,
-          routePrefixs,
-          routeHooks
-        })
+        handler: ctx => handler.list(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -302,20 +249,16 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref3.apply(this, arguments);
     };
   }()]));
-  router.post.apply(router, [routePrefixs.create(name, this.opts)].concat(middles, [
+  router.post.apply(router, [opts.routePrefixs.create(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref4 = _asyncToGenerator(function* (ctx) {
-      const optHook = routeHooks.create;
+      const optHook = opts.routeHooks.create;
       const h1 = hook.Hook({
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
-        handler: ctx => handler.create(name, ctx, {
-          ext: _this.ext,
-          routePrefixs,
-          routeHooks
-        })
+        handler: ctx => handler.create(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -327,20 +270,16 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref4.apply(this, arguments);
     };
   }()]));
-  router.put.apply(router, [routePrefixs.update(name, this.opts)].concat(middles, [
+  router.put.apply(router, [opts.routePrefixs.update(name, this.opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref5 = _asyncToGenerator(function* (ctx) {
-      const optHook = routeHooks.update;
+      const optHook = opts.routeHooks.update;
       const h1 = hook.Hook({
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
-        handler: ctx => handler.update(name, ctx, {
-          ext: _this.ext,
-          routePrefixs,
-          routeHooks
-        })
+        handler: ctx => handler.update(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -352,20 +291,16 @@ repo.Api.prototype.ALL = function (router, name) {
       return _ref5.apply(this, arguments);
     };
   }()]));
-  router.delete.apply(router, [routePrefixs.delete(name, this.opts)].concat(middles, [
+  router.delete.apply(router, [opts.routePrefixs.delete(name, opts)].concat(middles, [
   /*#__PURE__*/
   function () {
     var _ref6 = _asyncToGenerator(function* (ctx) {
-      const optHook = routeHooks.delete;
+      const optHook = opts.routeHooks.delete;
       const h1 = hook.Hook({
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
-        handler: ctx => handler.delete(name, ctx, {
-          ext: _this.ext,
-          routePrefixs,
-          routeHooks
-        })
+        handler: ctx => handler.delete(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -379,8 +314,7 @@ repo.Api.prototype.ALL = function (router, name) {
   }()]));
   profile.docs = profile.docs.concat(doc.GenDoc({
     profile,
-    routePrefixs,
-    opts: this.opts,
+    opts,
     apis: ['one', 'list', 'create', 'update', 'delete']
   }));
   return h;
@@ -494,49 +428,34 @@ repo.Api.defaultOpts = {
       }()
     },
     create: {
-      body: function () {
-        var _ref9 = _asyncToGenerator(function* (_body) {
-          return {
-            docs: _body.docs.map(x => _objectSpread({}, x, {
-              _dr: false,
-              _createdAt: moment().unix()
-            })),
-            category: _body.category
-          };
+      form: function () {
+        var _ref9 = _asyncToGenerator(function* (_form) {
+          return _form;
         });
 
-        return function body(_x8) {
+        return function form(_x8) {
           return _ref9.apply(this, arguments);
         };
       }()
     },
     delete: {
-      update: function () {
-        var _ref10 = _asyncToGenerator(function* (set) {
-          return _objectSpread({}, set, {
-            _dr: true,
-            _modifiedAt: moment().unix()
-          });
+      form: function () {
+        var _ref10 = _asyncToGenerator(function* (_form2) {
+          return _form2;
         });
 
-        return function update(_x9) {
+        return function form(_x9) {
           return _ref10.apply(this, arguments);
         };
       }()
     },
     update: {
-      body: function () {
-        var _ref11 = _asyncToGenerator(function* (_body2) {
-          return {
-            docs: _body2.docs.map(x => _objectSpread({}, x, {
-              _dr: false,
-              _modifiedAt: moment().unix()
-            })),
-            category: _body2.category
-          };
+      form: function () {
+        var _ref11 = _asyncToGenerator(function* (_form3) {
+          return _form3;
         });
 
-        return function body(_x10) {
+        return function form(_x10) {
           return _ref11.apply(this, arguments);
         };
       }()

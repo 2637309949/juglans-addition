@@ -7,24 +7,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
+const _ = require('lodash');
+
 const logger = require('../logger');
 
 const Query = require('./query');
+
+const utils = require('./utils');
 
 const repo = module.exports;
 
 repo.one =
 /*#__PURE__*/
 function () {
-  var _ref2 = _asyncToGenerator(function* (name, ctx, _ref) {
-    let {
-      ext,
-      routeHooks
-    } = _ref;
-
+  var _ref = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      let data;
-      const id = ctx.params.id;
+      const key = utils.findStringSubmatch(/:(.*)$/, opts.routePrefixs.one(name, opts));
+      const id = ctx.params[key];
       const Model = ext.Model(name);
       const q = Query(ctx.query);
       const project = q.buildProject();
@@ -34,7 +33,7 @@ function () {
           id
         }
       };
-      cond.where = yield routeHooks.one.cond(cond.where, {
+      cond.where = yield opts.routeHooks.one.cond(cond.where, {
         name
       });
 
@@ -43,9 +42,9 @@ function () {
       }
 
       cond.include = populate;
-      data = yield Model.findOne(cond);
+      const result = yield Model.findOne(cond);
       ctx.status = 200;
-      ctx.body = data;
+      ctx.body = result;
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -55,20 +54,15 @@ function () {
     }
   });
 
-  return function (_x, _x2, _x3) {
-    return _ref2.apply(this, arguments);
+  return function (_x, _x2, _x3, _x4) {
+    return _ref.apply(this, arguments);
   };
 }();
 
 repo.list =
 /*#__PURE__*/
 function () {
-  var _ref4 = _asyncToGenerator(function* (name, ctx, _ref3) {
-    let {
-      ext,
-      routeHooks
-    } = _ref3;
-
+  var _ref2 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
       let data;
       let totalpages;
@@ -82,7 +76,7 @@ function () {
       const match = {
         where: cond
       };
-      match.where = yield routeHooks.list.cond(match.where, {
+      match.where = yield opts.routeHooks.list.cond(match.where, {
         name
       });
 
@@ -101,9 +95,9 @@ function () {
 
       data = yield Model.findAll(match);
       totalrecords = yield Model.count(match);
-      totalpages = Math.ceil(totalrecords / q.size);
 
       if (q.range === 'PAGE') {
+        totalpages = Math.ceil(totalrecords / q.size);
         ctx.status = 200;
         ctx.body = {
           cond,
@@ -136,27 +130,20 @@ function () {
     }
   });
 
-  return function (_x4, _x5, _x6) {
-    return _ref4.apply(this, arguments);
+  return function (_x5, _x6, _x7, _x8) {
+    return _ref2.apply(this, arguments);
   };
 }();
 
 repo.create =
 /*#__PURE__*/
 function () {
-  var _ref6 = _asyncToGenerator(function* (name, ctx, _ref5) {
-    let {
-      ext,
-      routeHooks
-    } = _ref5;
-
+  var _ref3 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      const Model = ext.Model(name); // eslint-disable-next-line no-unused-vars
-
+      const Model = ext.Model(name);
       const {
-        docs,
-        category
-      } = yield routeHooks.create.body(ctx.request.body, {
+        docs
+      } = yield opts.routeHooks.create.form(ctx.request.body, {
         name
       });
       const result = yield Model.bulkCreate(docs);
@@ -171,40 +158,43 @@ function () {
     }
   });
 
-  return function (_x7, _x8, _x9) {
-    return _ref6.apply(this, arguments);
+  return function (_x9, _x10, _x11, _x12) {
+    return _ref3.apply(this, arguments);
   };
 }();
 
 repo.delete =
 /*#__PURE__*/
 function () {
-  var _ref8 = _asyncToGenerator(function* (name, ctx, _ref7) {
-    let {
-      ext,
-      routeHooks
-    } = _ref7;
-
+  var _ref4 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      // eslint-disable-next-line no-unused-vars
-      const {
-        docs,
-        category
-      } = ctx.request.body;
       const Model = ext.Model(name);
+      const {
+        docs
+      } = yield opts.routeHooks.delete.form(ctx.request.body, {
+        name
+      });
+
+      const noid = _.find(docs, function (doc) {
+        return doc['id'] === undefined || doc['id'] === '' || doc['id'] === null;
+      });
+
+      if (noid) {
+        ctx.body = {
+          message: 'no id found'
+        };
+        return;
+      }
+
       const results = [];
 
       for (const item of docs) {
-        const update = yield routeHooks.delete.update({
-          id: item.id
+        const result = yield Model.update({
+          deletedAt: new Date()
         }, {
-          name
-        });
-        const result = yield Model.update(update, {
           where: {
             id: item.id
-          },
-          fields: Object.keys(update)
+          }
         });
         results.push(result);
       }
@@ -220,30 +210,34 @@ function () {
     }
   });
 
-  return function (_x10, _x11, _x12) {
-    return _ref8.apply(this, arguments);
+  return function (_x13, _x14, _x15, _x16) {
+    return _ref4.apply(this, arguments);
   };
 }();
 
 repo.update =
 /*#__PURE__*/
 function () {
-  var _ref10 = _asyncToGenerator(function* (name, ctx, _ref9) {
-    let {
-      ext,
-      routeHooks
-    } = _ref9;
-
+  var _ref5 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      // eslint-disable-next-line no-unused-vars
       const {
-        docs,
-        category
-      } = yield routeHooks.update.body(ctx.request.body, {
+        docs
+      } = yield opts.routeHooks.update.form(ctx.request.body, {
         name
       });
       const Model = ext.Model(name);
       const results = [];
+
+      const noid = _.find(docs, function (doc) {
+        return doc['id'] === undefined || doc['id'] === '' || doc['id'] === null;
+      });
+
+      if (noid) {
+        ctx.body = {
+          message: 'no id found'
+        };
+        return;
+      }
 
       for (const item of docs) {
         const result = yield Model.update(item, {
@@ -266,7 +260,7 @@ function () {
     }
   });
 
-  return function (_x13, _x14, _x15) {
-    return _ref10.apply(this, arguments);
+  return function (_x17, _x18, _x19, _x20) {
+    return _ref5.apply(this, arguments);
   };
 }();

@@ -7,28 +7,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
+const _ = require('lodash');
+
+const moment = require('moment');
+
 const logger = require('../logger');
 
 const Query = require('./query');
+
+const utils = require('./utils');
 
 const repo = module.exports;
 
 repo.one =
 /*#__PURE__*/
 function () {
-  var _ref2 = _asyncToGenerator(function* (name, ctx, _ref) {
-    let {
-      ext,
-      routeHooks
-    } = _ref;
-
+  var _ref = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      const id = ctx.params.id;
+      const key = utils.findStringSubmatch(/:(.*)$/, opts.routePrefixs.one(name, opts));
+      const id = ctx.params[key[0]];
       const Model = ext.Model(name);
       const q = Query(ctx.query);
       const project = q.buildProject();
       const populate = q.buildPopulate();
-      const cond = yield routeHooks.one.cond({
+      const cond = yield opts.routeHooks.one.cond({
         _id: id
       }, {
         name
@@ -39,9 +41,9 @@ function () {
         query.populate(pop);
       }
 
-      const ret = yield query.exec();
+      const result = yield query.exec();
       ctx.status = 200;
-      ctx.body = ret;
+      ctx.body = result;
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -51,42 +53,37 @@ function () {
     }
   });
 
-  return function (_x, _x2, _x3) {
-    return _ref2.apply(this, arguments);
+  return function (_x, _x2, _x3, _x4) {
+    return _ref.apply(this, arguments);
   };
 }();
 
 repo.list =
 /*#__PURE__*/
 function () {
-  var _ref4 = _asyncToGenerator(function* (name, ctx, _ref3) {
-    let {
-      ext,
-      routeHooks
-    } = _ref3;
-
+  var _ref2 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
+      let totalpages;
+      let totalrecords;
+      let result;
       const q = Query(ctx.query);
       const cond = q.buildCond();
       const sort = q.buildSort();
       const project = q.buildProject();
       const populate = q.buildPopulate();
-      let totalpages;
-      let totalrecords;
-      let data;
       const Model = ext.Model(name);
-      const where = yield routeHooks.list.cond(cond, {
+      const where = yield opts.routeHooks.list.cond(cond, {
         name
       });
-      const query = Model.find(where, project).sort(sort);
+      let query = Model.find(where, project).sort(sort);
 
       for (const pop of populate) {
         query.populate(pop);
       }
 
       if (q.range === 'PAGE') {
-        query.skip((q.page - 1) * q.size).limit(q.size);
-        data = yield query.exec();
+        query = query.skip((q.page - 1) * q.size).limit(q.size);
+        result = yield query.exec();
         totalrecords = yield Model.where(where).countDocuments();
         totalpages = Math.ceil(totalrecords / q.size);
         ctx.status = 200;
@@ -99,11 +96,11 @@ function () {
           populate,
           totalpages,
           totalrecords,
-          data
+          data: result
         };
       } else if (q.range === 'ALL') {
-        data = yield query.exec();
-        totalrecords = data.length;
+        result = yield query.exec();
+        totalrecords = result.length;
         ctx.status = 200;
         ctx.body = {
           cond,
@@ -111,7 +108,7 @@ function () {
           project,
           populate,
           totalrecords,
-          data
+          data: result
         };
       }
     } catch (error) {
@@ -123,32 +120,25 @@ function () {
     }
   });
 
-  return function (_x4, _x5, _x6) {
-    return _ref4.apply(this, arguments);
+  return function (_x5, _x6, _x7, _x8) {
+    return _ref2.apply(this, arguments);
   };
 }();
 
 repo.create =
 /*#__PURE__*/
 function () {
-  var _ref6 = _asyncToGenerator(function* (name, ctx, _ref5) {
-    let {
-      ext,
-      routeHooks
-    } = _ref5;
-
+  var _ref3 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      const Model = ext.Model(name); // eslint-disable-next-line no-unused-vars
-
+      const Model = ext.Model(name);
       const {
-        docs,
-        category
-      } = yield routeHooks.create.body(ctx.request.body, {
+        docs
+      } = yield opts.routeHooks.create.form(ctx.request.body, {
         name
       });
-      const ret = yield Model.create(docs);
+      const result = yield Model.create(docs);
       ctx.status = 200;
-      ctx.body = ret;
+      ctx.body = result;
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -158,45 +148,51 @@ function () {
     }
   });
 
-  return function (_x7, _x8, _x9) {
-    return _ref6.apply(this, arguments);
+  return function (_x9, _x10, _x11, _x12) {
+    return _ref3.apply(this, arguments);
   };
 }();
 
 repo.delete =
 /*#__PURE__*/
 function () {
-  var _ref8 = _asyncToGenerator(function* (name, ctx, _ref7) {
-    let {
-      ext,
-      routeHooks
-    } = _ref7;
-
+  var _ref4 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      // eslint-disable-next-line no-unused-vars
-      const {
-        docs,
-        category
-      } = ctx.request.body;
       const Model = ext.Model(name);
-      const update = yield routeHooks.delete.update({}, {
+      const {
+        docs
+      } = yield opts.routeHooks.delete.form(ctx.request.body, {
         name
       });
-      const ret = yield Model.bulkWrite(docs.map(x => {
+
+      const noid = _.find(docs, function (doc) {
+        return doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null;
+      });
+
+      if (noid) {
+        ctx.body = {
+          message: 'no id found'
+        };
+        return;
+      }
+
+      const result = yield Model.bulkWrite(docs.map(x => {
         return {
           updateOne: {
             filter: {
               _id: x._id
             },
             update: {
-              $set: update
+              $set: {
+                _deletedAt: moment().unix()
+              }
             },
             upsert: false
           }
         };
       }));
       ctx.status = 200;
-      ctx.body = ret;
+      ctx.body = result;
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -206,35 +202,39 @@ function () {
     }
   });
 
-  return function (_x10, _x11, _x12) {
-    return _ref8.apply(this, arguments);
+  return function (_x13, _x14, _x15, _x16) {
+    return _ref4.apply(this, arguments);
   };
 }();
 
 repo.update =
 /*#__PURE__*/
 function () {
-  var _ref10 = _asyncToGenerator(function* (name, ctx, _ref9) {
-    let {
-      ext,
-      routeHooks
-    } = _ref9;
-
+  var _ref5 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      // eslint-disable-next-line no-unused-vars
       const {
-        docs,
-        category
-      } = yield routeHooks.update.body(ctx.request.body, {
+        docs
+      } = yield opts.routeHooks.update.form(ctx.request.body, {
         name
       });
       const Model = ext.Model(name);
+
+      const noid = _.find(docs, function (doc) {
+        return doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null;
+      });
+
+      if (noid) {
+        ctx.body = {
+          message: 'no id found'
+        };
+        return;
+      }
+
       const ret = yield Model.bulkWrite(docs.map(x => {
         return {
           updateOne: {
             filter: {
-              _id: x._id,
-              _dr: false
+              _id: x._id
             },
             update: {
               $set: x
@@ -254,7 +254,7 @@ function () {
     }
   });
 
-  return function (_x13, _x14, _x15) {
-    return _ref10.apply(this, arguments);
+  return function (_x17, _x18, _x19, _x20) {
+    return _ref5.apply(this, arguments);
   };
 }();
