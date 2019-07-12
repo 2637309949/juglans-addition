@@ -60,6 +60,9 @@ Query.prototype.build = function (_ref2) {
   let {
     model
   } = _ref2;
+  this.page = this.query.page;
+  this.size = this.query.size;
+  this.range = this.query.range;
   this.buildCond();
   this.buildSort();
   this.buildProject();
