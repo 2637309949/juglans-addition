@@ -7,6 +7,8 @@ const is = require('is');
 
 const utils = require('./utils');
 
+const logger = require('../logger');
+
 function Query(_ref) {
   let {
     cond = '%7B%7D',
@@ -30,64 +32,86 @@ function Query(_ref) {
     });
   }
 
-  this.cond = cond;
-  this.condMap = {};
-  this.sort = sort;
-  this.project = project;
-  this.populate = populate;
-  this.page = parseInt(page);
-  this.size = parseInt(size);
-  this.range = range === 'ALL' ? 'ALL' : 'PAGE';
+  try {
+    this.query = {
+      cond,
+      sort,
+      project,
+      populate,
+      page,
+      size,
+      range
+    };
+    this.cond = {};
+    this.operators = {};
+    this.sort = {};
+    this.project = [];
+    this.populate = [];
+    this.page = parseInt(page);
+    this.size = parseInt(size);
+    this.range = range === 'ALL' ? 'ALL' : 'PAGE';
+  } catch (error) {
+    logger.error(error.stack || error.message);
+    throw error;
+  }
 }
+
+Query.prototype.build = function (_ref2) {
+  let {
+    model
+  } = _ref2;
+  this.buildCond();
+  this.buildSort();
+  this.buildProject();
+  this.buildPopulate(model);
+  return this;
+};
 
 Query.prototype.buildCond = function () {
   try {
-    if (is.string(this.cond)) {
-      let cond = JSON.parse(decodeURIComponent(this.cond));
-      this.condMap = cond;
-      cond = utils.toOperators(cond);
-      return cond;
+    if (is.string(this.query.cond)) {
+      this.cond = JSON.parse(decodeURIComponent(this.query.cond));
+      this.operators = utils.toOperators(this.cond);
     }
-
-    return {};
   } catch (error) {
-    console.error('parse cond error!');
+    logger.error(error.stack || error.message);
     throw error;
   }
 };
 
 Query.prototype.buildSort = function () {
-  if (!this.sort || !this.sort.trim()) return {};
-  return this.sort.trim().split(',').filter(x => !!x).map(x => x.trim()).reduce((acc, curr) => {
-    let order = 1;
+  if (this.query.sort && this.query.sort.trim()) {
+    this.sort = this.query.sort.trim().split(',').filter(x => !!x).map(x => x.trim()).reduce((acc, curr) => {
+      let order = 1;
 
-    if (curr.startsWith('-')) {
-      curr = curr.substr(1);
-      order = -1;
-    }
+      if (curr.startsWith('-')) {
+        curr = curr.substr(1);
+        order = -1;
+      }
 
-    acc[curr] = order;
-    return acc;
-  }, {});
+      acc[curr] = order;
+      return acc;
+    }, {});
+  }
 };
 
 Query.prototype.buildProject = function () {
-  if (!this.project || !this.project.trim()) return [];
-  return this.project.trim().split(',').filter(x => !!x).map(x => x.trim());
+  if (this.query.project && this.query.project.trim()) {
+    this.project = this.query.project.trim().split(',').filter(x => !!x).map(x => x.trim());
+  }
 };
 
 Query.prototype.buildPopulate = function (model) {
-  const associations = utils.associations(model);
-  if (!this.populate || !this.populate.trim()) return [];
-  let populate = this.populate.trim().split(',').filter(x => !!x).map(x => x.trim());
-  populate = populate.map(x => {
-    const assoc = associations.find(as => as.foreignKey === x);
-    return assoc;
-  }).filter(x => !!x).map(x => ({
-    model: x.model,
-    as: x.as
-  }));
-  return populate;
+  if (this.query.populate && this.query.populate.trim()) {
+    const associations = utils.associations(model);
+    this.populate = this.query.populate.trim().split(',').filter(x => !!x).map(x => x.trim()).map(x => {
+      const assoc = associations.find(as => as.foreignKey === x);
+      return assoc;
+    }).filter(x => !!x).map(x => ({
+      model: x.model,
+      as: x.as
+    }));
+  }
 };
 
 module.exports = Query;

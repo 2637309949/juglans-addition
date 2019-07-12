@@ -25,9 +25,9 @@ function () {
       const key = utils.findStringSubmatch(/:(.*)$/, opts.routePrefixs.one(name, opts));
       const id = ctx.params[key];
       const Model = ext.Model(name);
-      const q = Query(ctx.query);
-      const project = q.buildProject();
-      const populate = q.buildPopulate(Model);
+      const q = Query(ctx.query).build({
+        model: Model
+      });
       const cond = {
         where: {
           id
@@ -37,11 +37,11 @@ function () {
         name
       });
 
-      if (project.length > 0) {
-        cond.attributes = project;
+      if (q.project.length > 0) {
+        cond.attributes = q.project;
       }
 
-      cond.include = populate;
+      cond.include = q.populate;
       const result = yield Model.findOne(cond);
       ctx.status = 200;
       ctx.body = result;
@@ -68,24 +68,22 @@ function () {
       let totalpages;
       let totalrecords;
       const Model = ext.Model(name);
-      const q = Query(ctx.query);
-      const cond = q.buildCond();
-      const sort = q.buildSort();
-      const project = q.buildProject();
-      const populate = q.buildPopulate(Model);
+      const q = Query(ctx.query).build({
+        model: Model
+      });
       const match = {
-        where: cond
+        where: q.operators
       };
       match.where = yield opts.routeHooks.list.cond(match.where, {
         name
       });
 
-      if (project.length > 0) {
-        match.attributes = project;
+      if (q.project.length > 0) {
+        match.attributes = q.project;
       }
 
-      if (populate.length > 0) {
-        match.include = populate;
+      if (q.populate.length > 0) {
+        match.include = q.populate;
       }
 
       if (q.range === 'PAGE') {
@@ -94,18 +92,19 @@ function () {
       }
 
       data = yield Model.findAll(match);
+      delete match.attributes;
       totalrecords = yield Model.count(match);
 
       if (q.range === 'PAGE') {
         totalpages = Math.ceil(totalrecords / q.size);
         ctx.status = 200;
         ctx.body = {
-          cond: q.condMap,
+          cond: q.cond,
           page: q.page,
           size: q.size,
-          sort,
-          project,
-          populate: populate,
+          sort: q.sort,
+          project: q.project,
+          populate: q.populate,
           totalpages,
           totalrecords,
           data
@@ -113,10 +112,10 @@ function () {
       } else {
         ctx.status = 200;
         ctx.body = {
-          cond,
-          sort,
-          project,
-          populate: populate,
+          cond: q.cond,
+          sort: q.sort,
+          project: q.project,
+          populate: q.populate,
           totalrecords,
           data
         };

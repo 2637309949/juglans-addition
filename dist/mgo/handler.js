@@ -27,17 +27,15 @@ function () {
       const key = utils.findStringSubmatch(/:(.*)$/, opts.routePrefixs.one(name, opts));
       const id = ctx.params[key[0]];
       const Model = ext.Model(name);
-      const q = Query(ctx.query);
-      const project = q.buildProject();
-      const populate = q.buildPopulate();
+      const q = Query(ctx.query).build();
       const cond = yield opts.routeHooks.one.cond({
         _id: id
       }, {
         name
       });
-      const query = Model.findOne(cond, project);
+      const query = Model.findOne(cond, q.project);
 
-      for (const pop of populate) {
+      for (const pop of q.populate) {
         query.populate(pop);
       }
 
@@ -66,18 +64,14 @@ function () {
       let totalpages;
       let totalrecords;
       let result;
-      const q = Query(ctx.query);
-      const cond = q.buildCond();
-      const sort = q.buildSort();
-      const project = q.buildProject();
-      const populate = q.buildPopulate();
+      const q = Query(ctx.query).build();
       const Model = ext.Model(name);
-      const where = yield opts.routeHooks.list.cond(cond, {
+      const where = yield opts.routeHooks.list.cond(q.cond, {
         name
       });
-      let query = Model.find(where, project).sort(sort);
+      let query = Model.find(where, q.project).sort(q.sort);
 
-      for (const pop of populate) {
+      for (const pop of q.populate) {
         query.populate(pop);
       }
 
@@ -88,12 +82,12 @@ function () {
         totalpages = Math.ceil(totalrecords / q.size);
         ctx.status = 200;
         ctx.body = {
-          cond,
+          cond: q.cond,
           page: q.page,
           size: q.size,
-          sort,
-          project,
-          populate,
+          sort: q.sort,
+          project: q.project,
+          populate: q.populate,
           totalpages,
           totalrecords,
           data: result
@@ -103,10 +97,10 @@ function () {
         totalrecords = result.length;
         ctx.status = 200;
         ctx.body = {
-          cond,
-          sort,
-          project,
-          populate,
+          cond: q.cond,
+          sort: q.sort,
+          project: q.project,
+          populate: q.populate,
           totalrecords,
           data: result
         };
