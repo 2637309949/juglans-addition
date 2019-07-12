@@ -5,13 +5,13 @@
 - [Directory](#directory)
 - [juglans-addition](#juglans-addition)
     - [mongoose addition](#mongoose-addition)
-        - [new Connect](#new-connect)
-        - [use as plugin](#use-as-plugin)
-        - [custom default api](#custom-default-api)
+        - [Create addition](#create-addition)
+        - [Use as plugin](#use-as-plugin)
+        - [Custom default api if you need](#custom-default-api-if-you-need)
     - [sequelize addition](#sequelize-addition)
-        - [new Connect](#new-connect-1)
-        - [use as plugin](#use-as-plugin-1)
-        - [custom default api](#custom-default-api-1)
+        - [Create addition](#create-addition-1)
+        - [Use as plugin](#use-as-plugin-1)
+        - [Custom default api if you need](#custom-default-api-if-you-need-1)
     - [redis addition](#redis-addition)
     - [apidoc](#apidoc)
         - [Install apidoc](#install-apidoc)
@@ -29,7 +29,7 @@
 ### mongoose addition
 
     mgoext provide model Registered, mongoose and configuration of the default api
-#### new Connect
+#### Create addition
 
 ```javascript
 repo.mgoExt = mgo.Ext.Connect(config.mongo.uri, config.mongo.opts)
@@ -37,12 +37,12 @@ repo.mgoExt.setApiOpts({
   prefix: '/template/mgo'
 })
 ```
-#### use as plugin
+#### Use as plugin
 ```javascript
 app.PostUse(repo.mgoExt)
 ```
 
-#### custom default api
+#### Custom default api if you need
 
 ```javascript
 const User = mgoExt.Register({
@@ -76,7 +76,7 @@ module.exports = function ({ router }) {
 
 ### sequelize addition
 
-#### new Connect
+#### Create addition
 
 ```javascript
 // sequelize init
@@ -85,12 +85,12 @@ repo.SeqExt = seq.Ext.Connect(config.sql.uri, config.sql.opts)
 repo.SeqExt.setApiOpts({
 })
 ```
-#### use as plugin
+#### Use as plugin
 ```javascript
 app.PostUse(repo.SeqExt)
 ```
 
-#### custom default api
+#### Custom default api if you need
 
 ```javascript
 const User = SeqExt.Register({
