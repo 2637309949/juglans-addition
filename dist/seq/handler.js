@@ -100,7 +100,7 @@ function () {
         totalpages = Math.ceil(totalrecords / q.size);
         ctx.status = 200;
         ctx.body = {
-          cond,
+          cond: q.condMap,
           page: q.page,
           size: q.size,
           sort,

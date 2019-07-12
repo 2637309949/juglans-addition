@@ -31,6 +31,7 @@ function Query(_ref) {
   }
 
   this.cond = cond;
+  this.condMap = {};
   this.sort = sort;
   this.project = project;
   this.populate = populate;
@@ -42,7 +43,10 @@ function Query(_ref) {
 Query.prototype.buildCond = function () {
   try {
     if (is.string(this.cond)) {
-      return JSON.parse(decodeURIComponent(this.cond));
+      let cond = JSON.parse(decodeURIComponent(this.cond));
+      this.condMap = cond;
+      cond = utils.toOperators(cond);
+      return cond;
     }
 
     return {};
