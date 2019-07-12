@@ -49,8 +49,8 @@ function Query(_ref) {
 }
 
 Query.prototype.build = function () {
-  this.page = this.query.page;
-  this.size = this.query.size;
+  this.page = parseInt(this.query.page);
+  this.size = parseInt(this.query.size);
   this.range = this.query.range;
   this.buildCond();
   this.buildSort();
