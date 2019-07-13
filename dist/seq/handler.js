@@ -28,23 +28,23 @@ function () {
       const q = Query(ctx.query).build({
         model: Model
       });
-      const cond = {
-        where: {
-          id
-        }
-      };
-      cond.where = yield opts.routeHooks.one.cond(cond.where, {
+      q.cond = yield opts.routeHooks.one.cond(_.assign(q.cond, {
+        id,
+        deletedAt: null
+      }), {
         name
       });
+      const cond = {
+        where: q.cond
+      };
 
       if (q.project.length > 0) {
         cond.attributes = q.project;
       }
 
       cond.include = q.populate;
-      const result = yield Model.findOne(cond);
       ctx.status = 200;
-      ctx.body = result;
+      ctx.body = yield Model.findOne(cond);
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -64,17 +64,21 @@ repo.list =
 function () {
   var _ref2 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      let data;
       let totalpages;
       let totalrecords;
       const Model = ext.Model(name);
       const q = Query(ctx.query).build({
         model: Model
       });
+      q.cond = _.assign(q.cond, {
+        deletedAt: null
+      });
       const match = {
         where: q.operators
       };
-      match.where = yield opts.routeHooks.list.cond(match.where, {
+      match.where = yield opts.routeHooks.list.cond(_.assign(match.where, {
+        deletedAt: null
+      }), {
         name
       });
 
@@ -91,9 +95,8 @@ function () {
         match.limit = q.size;
       }
 
-      data = yield Model.findAll(match);
-      delete match.attributes;
-      totalrecords = yield Model.count(match);
+      const list = yield Model.findAll(match);
+      totalrecords = yield Model.count(_.omit(match, ['attributes']));
 
       if (q.range === 'PAGE') {
         totalpages = Math.ceil(totalrecords / q.size);
@@ -107,7 +110,7 @@ function () {
           populate: q.populate,
           totalpages,
           totalrecords,
-          data
+          list
         };
       } else {
         ctx.status = 200;
@@ -117,7 +120,7 @@ function () {
           project: q.project,
           populate: q.populate,
           totalrecords,
-          data
+          list
         };
       }
     } catch (error) {
@@ -140,14 +143,16 @@ function () {
   var _ref3 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
       const Model = ext.Model(name);
-      const {
-        docs
-      } = yield opts.routeHooks.create.form(ctx.request.body, {
+      let form = ctx.request.body;
+      form.docs = form.docs.map(doc => {
+        doc.createdAt = new Date();
+        return doc;
+      });
+      form = yield opts.routeHooks.create.form(form, {
         name
       });
-      const result = yield Model.bulkCreate(docs);
       ctx.status = 200;
-      ctx.body = result;
+      ctx.body = yield Model.bulkCreate(form.docs);
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -168,34 +173,35 @@ function () {
   var _ref4 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
       const Model = ext.Model(name);
-      const {
-        docs
-      } = yield opts.routeHooks.delete.form(ctx.request.body, {
-        name
-      });
+      let form = ctx.request.body;
 
-      const noid = _.find(docs, function (doc) {
-        return doc['id'] === undefined || doc['id'] === '' || doc['id'] === null;
-      });
+      for (let index = 0; index < form.docs.length; index++) {
+        const doc = form.docs[index];
 
-      if (noid) {
-        ctx.body = {
-          message: 'no id found'
-        };
-        return;
+        if (doc['id'] === undefined || doc['id'] === '' || doc['id'] === null) {
+          ctx.body = {
+            message: 'no id found'
+          };
+          return;
+        }
       }
 
+      form.docs = form.docs.map(doc => {
+        doc.deletedAt = new Date();
+        return doc;
+      });
+      form = yield opts.routeHooks.delete.form(form, {
+        name
+      });
       const results = [];
 
-      for (const item of docs) {
-        const result = yield Model.update({
-          deletedAt: new Date()
-        }, {
+      for (const doc of form.docs) {
+        const ret = yield Model.update(_.pick(doc, ['deletedAt']), {
           where: {
-            id: item.id
+            id: doc.id
           }
         });
-        results.push(result);
+        results.push(ret);
       }
 
       ctx.status = 200;
@@ -219,33 +225,33 @@ repo.update =
 function () {
   var _ref5 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      const {
-        docs
-      } = yield opts.routeHooks.update.form(ctx.request.body, {
-        name
-      });
       const Model = ext.Model(name);
-      const results = [];
+      let form = ctx.request.body;
 
-      const noid = _.find(docs, function (doc) {
-        return doc['id'] === undefined || doc['id'] === '' || doc['id'] === null;
-      });
+      for (let index = 0; index < form.docs.length; index++) {
+        const doc = form.docs[index];
 
-      if (noid) {
-        ctx.body = {
-          message: 'no id found'
-        };
-        return;
+        if (doc['id'] === undefined || doc['id'] === '' || doc['id'] === null) {
+          ctx.body = {
+            message: 'no id found'
+          };
+          return;
+        }
       }
 
-      for (const item of docs) {
-        const result = yield Model.update(item, {
+      form = yield opts.routeHooks.update.form(form, {
+        name
+      });
+      const results = [];
+
+      for (const doc of form.docs) {
+        const ret = yield Model.update(doc, {
           where: {
-            id: item.id
+            id: doc.id
           },
-          fields: Object.keys(item)
+          fields: Object.keys(doc)
         });
-        results.push(result);
+        results.push(ret);
       }
 
       ctx.status = 200;

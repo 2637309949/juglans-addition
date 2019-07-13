@@ -28,20 +28,18 @@ function () {
       const id = ctx.params[key[0]];
       const Model = ext.Model(name);
       const q = Query(ctx.query).build();
-      const cond = yield opts.routeHooks.one.cond({
-        _id: id
-      }, {
+      const cond = yield opts.routeHooks.one.cond(_.assign(q.cond, {
+        _id: id,
+        deletedAt: null
+      }), {
         name
       });
       const query = Model.findOne(cond, q.project);
-
-      for (const pop of q.populate) {
+      q.populate.forEach(pop => {
         query.populate(pop);
-      }
-
-      const result = yield query.exec();
+      });
       ctx.status = 200;
-      ctx.body = result;
+      ctx.body = yield query.exec();
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -66,19 +64,20 @@ function () {
       let result;
       const q = Query(ctx.query).build();
       const Model = ext.Model(name);
-      const where = yield opts.routeHooks.list.cond(q.cond, {
+      const cond = yield opts.routeHooks.list.cond(_.assign(q.cond, {
+        deletedAt: null
+      }), {
         name
       });
-      let query = Model.find(where, q.project).sort(q.sort);
-
-      for (const pop of q.populate) {
+      let query = Model.find(cond, q.project).sort(q.sort);
+      q.populate.forEach(pop => {
         query.populate(pop);
-      }
+      });
 
       if (q.range === 'PAGE') {
         query = query.skip((q.page - 1) * q.size).limit(q.size);
         result = yield query.exec();
-        totalrecords = yield Model.where(where).countDocuments();
+        totalrecords = yield Model.where(cond).countDocuments();
         totalpages = Math.ceil(totalrecords / q.size);
         ctx.status = 200;
         ctx.body = {
@@ -125,14 +124,16 @@ function () {
   var _ref3 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
       const Model = ext.Model(name);
-      const {
-        docs
-      } = yield opts.routeHooks.create.form(ctx.request.body, {
+      let form = ctx.request.body;
+      form.docs = form.docs.map(doc => {
+        doc.createdAt = moment().unix();
+        return doc;
+      });
+      form = yield opts.routeHooks.create.form(form, {
         name
       });
-      const result = yield Model.create(docs);
       ctx.status = 200;
-      ctx.body = result;
+      ctx.body = yield Model.create(form.docs);
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -153,40 +154,38 @@ function () {
   var _ref4 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
       const Model = ext.Model(name);
-      const {
-        docs
-      } = yield opts.routeHooks.delete.form(ctx.request.body, {
-        name
-      });
+      let form = ctx.request.body;
 
-      const noid = _.find(docs, function (doc) {
-        return doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null;
-      });
+      for (let index = 0; index < form.docs.length; index++) {
+        const doc = form.docs[index];
 
-      if (noid) {
-        ctx.body = {
-          message: 'no id found'
-        };
-        return;
+        if (doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null) {
+          ctx.body = {
+            message: 'no id found'
+          };
+          return;
+        }
       }
 
-      const result = yield Model.bulkWrite(docs.map(x => {
+      form.docs = form.docs.map(doc => {
+        doc.deletedAt = moment().unix();
+        return doc;
+      });
+      form = yield opts.routeHooks.delete.form(form, {
+        name
+      });
+      ctx.status = 200;
+      ctx.body = yield Model.bulkWrite(form.docs.map(doc => {
         return {
           updateOne: {
-            filter: {
-              _id: x._id
-            },
+            filter: _.pick(doc, ['_id']),
             update: {
-              $set: {
-                _deletedAt: moment().unix()
-              }
+              $set: _.pick(doc, ['deletedAt'])
             },
             upsert: false
           }
         };
       }));
-      ctx.status = 200;
-      ctx.body = result;
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -206,25 +205,29 @@ repo.update =
 function () {
   var _ref5 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
-      const {
-        docs
-      } = yield opts.routeHooks.update.form(ctx.request.body, {
+      let form = ctx.request.body;
+
+      for (let index = 0; index < form.docs.length; index++) {
+        const doc = form.docs[index];
+
+        if (doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null) {
+          ctx.body = {
+            message: 'no id found'
+          };
+          return;
+        }
+      }
+
+      form.docs = form.docs.map(doc => {
+        doc.modifiedAt = moment().unix();
+        return doc;
+      });
+      form = yield opts.routeHooks.update.form(form, {
         name
       });
       const Model = ext.Model(name);
-
-      const noid = _.find(docs, function (doc) {
-        return doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null;
-      });
-
-      if (noid) {
-        ctx.body = {
-          message: 'no id found'
-        };
-        return;
-      }
-
-      const ret = yield Model.bulkWrite(docs.map(x => {
+      ctx.status = 200;
+      ctx.body = yield Model.bulkWrite(form.docs.map(x => {
         return {
           updateOne: {
             filter: {
@@ -237,8 +240,6 @@ function () {
           }
         };
       }));
-      ctx.status = 200;
-      ctx.body = ret;
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;

@@ -18,6 +18,7 @@
         - [Add ignore to .igonre file](#add-ignore-to-igonre-file)
         - [Generate apidoc](#generate-apidoc)
         - [Use apidoc plugin](#use-apidoc-plugin)
+        - [Review](#review)
 - [MIT License](#mit-license)
 
 <!-- /TOC -->
@@ -43,7 +44,6 @@ app.PostUse(repo.mgoExt)
 ```
 
 #### Custom default api if you need
-
 ```javascript
 const User = mgoExt.Register({
   name: 'User',
@@ -51,7 +51,6 @@ const User = mgoExt.Register({
   schema: defineSchema,
   autoHook: false
 })
-
 module.exports = function ({ router }) {
   // routes: api/v1/mgo/user
   mgoExt.api.List(router, 'User').Pre(async function (ctx) {
@@ -71,7 +70,6 @@ module.exports = function ({ router }) {
   mgoExt.api.Update(router, 'User')
   mgoExt.api.Create(router, 'User')
 }
-
 ```
 
 ### sequelize addition
@@ -153,6 +151,9 @@ repo.apidoc = apidoc({ prefix: '/docs' })
 repo.apidoc.doc(path.join(__dirname, '../doc'))
 app.Use(repo.apidoc)
 ```
+#### Review
+![Juglans flash](./asserts/apidoc.png)
+
 
 ## MIT License
 
