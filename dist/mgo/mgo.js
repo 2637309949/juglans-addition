@@ -9,6 +9,8 @@ const assert = require('assert');
 
 const is = require('is');
 
+const merge = require('deepmerge');
+
 const _ = require('lodash');
 
 const api = require('./api');
@@ -20,7 +22,11 @@ repo.mongoose = mongoose;
 repo.Ext = Ext;
 repo.Ext.Model = model; // Connect defined connect func
 
-repo.Ext.Connect = function (uri, opts) {
+repo.Ext.defaultConnectOpts = {};
+
+repo.Ext.Connect = function (uri) {
+  let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  opts = merge.all([opts, repo.Ext.defaultConnectOpts]);
   const mgo = mongoose.createConnection(uri, opts);
   return new Ext({
     mgo
@@ -53,6 +59,7 @@ repo.Ext.prototype.Docs = function () {
 
 repo.Ext.prototype.Register = function () {
   let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   assert.ok(is.string(schema.name), 'name can not be empty!');
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
   schema.docs = [];
@@ -61,12 +68,17 @@ repo.Ext.prototype.Register = function () {
 }; // Register model and return model
 
 
-repo.Ext.prototype.DefineSchema = function () {
-  for (var _len = arguments.length, schema = new Array(_len), _key = 0; _key < _len; _key++) {
-    schema[_key] = arguments[_key];
+repo.Ext.defaultSchemaOpts = {
+  timestamps: {
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   }
+};
 
-  return Object.assign.apply(Object, [{}, model].concat(schema));
+repo.Ext.prototype.DefineSchema = function (schema) {
+  let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  opts = merge.all([opts, repo.Ext.defaultSchemaOpts]);
+  return new mongoose.Schema(_.assign(schema, repo.Ext.Model), opts);
 }; // shortcut for sequelize model
 
 

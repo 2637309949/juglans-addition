@@ -5,17 +5,17 @@
 // license that can be found in the LICENSE file.
 module.exports = {
   createdAt: {
-    type: Number,
+    type: Date,
     displayName: '创建时间',
     require: true
   },
-  modifiedAt: {
-    type: Number,
+  updatedAt: {
+    type: Date,
     displayName: '修改时间',
     remark: 'UNIX时间戳'
   },
   deletedAt: {
-    type: Number,
+    type: Date,
     displayName: '删除时间',
     remark: 'UNIX时间戳'
   }

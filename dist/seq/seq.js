@@ -23,13 +23,13 @@ const repo = module.exports;
 repo.Sequelize = Sequelize;
 repo.Ext = Ext;
 repo.Ext.Model = model;
-repo.Ext.defaultOpts = {
+repo.Ext.defaultConnectOpts = {
   paranoid: true
 };
 
 repo.Ext.Connect = function (uri) {
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  opts = merge.all([Ext.defaultOpts, opts]);
+  opts = merge.all([opts, repo.Ext.defaultConnectOpts]);
   const sequelize = new Sequelize(uri, opts);
   sequelize.authenticate().then(() => {
     logger.info('Connection has been established successfully');
@@ -66,6 +66,12 @@ repo.Ext.prototype.Docs = function () {
 }; // Register model and return model
 
 
+repo.Ext.defaultRegisterOpts = {
+  charset: 'utf8',
+  collate: 'utf8_general_ci',
+  paranoid: true
+};
+
 repo.Ext.prototype.Register = function () {
   let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -73,11 +79,7 @@ repo.Ext.prototype.Register = function () {
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
   schema.docs = [];
   this.m.push(schema);
-  opts = merge.all([{
-    charset: 'utf8',
-    collate: 'utf8_general_ci',
-    paranoid: true
-  }, opts]);
+  opts = merge.all([opts, repo.Ext.defaultRegisterOpts]);
   return this.sequelize.define(schema.name, schema.schema, opts);
 }; // Register model and return model
 

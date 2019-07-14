@@ -9,8 +9,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // license that can be found in the LICENSE file.
 const _ = require('lodash');
 
-const moment = require('moment');
-
 const logger = require('../logger');
 
 const Query = require('./query');
@@ -125,9 +123,9 @@ function () {
     try {
       const Model = ext.Model(name);
       let form = ctx.request.body;
-      form.docs = form.docs.map(doc => {
-        doc.createdAt = moment().unix();
-        return doc;
+      form.docs.forEach(doc => {
+        delete doc.createdAt;
+        delete doc.updatedAt;
       });
       form = yield opts.routeHooks.create.form(form, {
         name
@@ -135,10 +133,11 @@ function () {
       ctx.status = 200;
       ctx.body = yield Model.create(form.docs);
     } catch (error) {
-      logger.error(error.stack || error.message);
+      logger.error(error.stack);
       ctx.status = 500;
       ctx.body = {
-        message: 'Internal Server Error'
+        message: 'Internal Server Error',
+        stack: error.stack
       };
     }
   });
@@ -167,9 +166,10 @@ function () {
         }
       }
 
-      form.docs = form.docs.map(doc => {
-        doc.deletedAt = moment().unix();
-        return doc;
+      form.docs.forEach(doc => {
+        delete doc.createdAt;
+        delete doc.updatedAt;
+        doc.deletedAt = new Date();
       });
       form = yield opts.routeHooks.delete.form(form, {
         name
@@ -218,9 +218,9 @@ function () {
         }
       }
 
-      form.docs = form.docs.map(doc => {
-        doc.modifiedAt = moment().unix();
-        return doc;
+      form.docs.forEach(doc => {
+        delete doc.createdAt;
+        delete doc.updatedAt;
       });
       form = yield opts.routeHooks.update.form(form, {
         name
