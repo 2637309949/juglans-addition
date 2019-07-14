@@ -62,7 +62,12 @@ repo.GenDoc = function (_ref) {
         'parameter': {
           'fields': {
             'Parameter': fields
-          }
+          },
+          'examples': [{
+            'title': 'Request-Example:',
+            'content': '{\n  "cond": { "age": { $gte: 1 } },\n  "range": "page",\n  "page": 1,\n  "size": 10,\n  "project": "_id,name",\n  "preload": "Creator",\n  "order": "-_created",\n}',
+            'type': 'json'
+          }]
         },
         'version': '0.0.0'
       });
@@ -77,7 +82,12 @@ repo.GenDoc = function (_ref) {
         'parameter': {
           'fields': {
             'Parameter': fields
-          }
+          },
+          'examples': [{
+            'title': 'Request-Example:',
+            'content': '{\n  "cond": { "age": { $gte: 1 } },\n  "range": "page",\n  "page": 1,\n  "size": 10,\n  "project": "_id,name",\n  "preload": "Creator",\n  "order": "-_created",\n}',
+            'type': 'json'
+          }]
         },
         'version': '0.0.0'
       });
@@ -92,7 +102,12 @@ repo.GenDoc = function (_ref) {
         'parameter': {
           'fields': {
             'Parameter': fields
-          }
+          },
+          'examples': [{
+            'title': 'Request-Example:',
+            'content': '{\n  "docs": [{ "xx": "" }],\n  "category": "instruction for use",\n}',
+            'type': 'json'
+          }]
         },
         'version': '0.0.0'
       });
@@ -122,7 +137,12 @@ repo.GenDoc = function (_ref) {
         'parameter': {
           'fields': {
             'Parameter': fields
-          }
+          },
+          'examples': [{
+            'title': 'Request-Example:',
+            'content': '{\n  "docs": [{ "xx": "" }],\n  "category": "instruction for use",\n}',
+            'type': 'json'
+          }]
         },
         'version': '0.0.0'
       });
