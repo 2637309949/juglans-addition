@@ -1,9 +1,5 @@
 "use strict";
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -399,64 +395,74 @@ repo.Api.defaultOpts = {
   routeHooks: {
     one: {
       cond: function () {
-        var _ref7 = _asyncToGenerator(function* (_cond) {
-          return _objectSpread({}, _cond, {
-            _dr: {
-              $ne: true
-            }
-          });
+        var _ref7 = _asyncToGenerator(function* (_cond, ctx, opts) {
+          return _cond;
         });
 
-        return function cond(_x6) {
+        return function cond(_x6, _x7, _x8) {
           return _ref7.apply(this, arguments);
         };
       }()
     },
     list: {
       cond: function () {
-        var _ref8 = _asyncToGenerator(function* (_cond2) {
-          return _objectSpread({}, _cond2, {
-            _dr: {
-              $ne: true
-            }
-          });
+        var _ref8 = _asyncToGenerator(function* (_cond2, ctx, opts) {
+          return _cond2;
         });
 
-        return function cond(_x7) {
+        return function cond(_x9, _x10, _x11) {
           return _ref8.apply(this, arguments);
         };
       }()
     },
     create: {
       form: function () {
-        var _ref9 = _asyncToGenerator(function* (_form) {
+        var _ref9 = _asyncToGenerator(function* (_form, opts) {
           return _form;
         });
 
-        return function form(_x8) {
+        return function form(_x12, _x13) {
           return _ref9.apply(this, arguments);
         };
       }()
     },
     delete: {
       form: function () {
-        var _ref10 = _asyncToGenerator(function* (_form2) {
+        var _ref10 = _asyncToGenerator(function* (_form2, opts) {
           return _form2;
         });
 
-        return function form(_x9) {
+        return function form(_x14, _x15) {
           return _ref10.apply(this, arguments);
+        };
+      }(),
+      cond: function () {
+        var _ref11 = _asyncToGenerator(function* (_cond3, ctx, opts) {
+          return _cond3;
+        });
+
+        return function cond(_x16, _x17, _x18) {
+          return _ref11.apply(this, arguments);
         };
       }()
     },
     update: {
       form: function () {
-        var _ref11 = _asyncToGenerator(function* (_form3) {
+        var _ref12 = _asyncToGenerator(function* (_form3, opts) {
           return _form3;
         });
 
-        return function form(_x10) {
-          return _ref11.apply(this, arguments);
+        return function form(_x19, _x20) {
+          return _ref12.apply(this, arguments);
+        };
+      }(),
+      cond: function () {
+        var _ref13 = _asyncToGenerator(function* (_cond4, ctx, opts) {
+          return _cond4;
+        });
+
+        return function cond(_x21, _x22, _x23) {
+          return _ref13.apply(this, arguments);
         };
       }()
     }

@@ -186,20 +186,18 @@ function () {
         }
       }
 
-      form.docs = form.docs.map(doc => {
-        doc.deletedAt = new Date();
-        return doc;
-      });
       form = yield opts.routeHooks.delete.form(form, {
         name
       });
       const results = [];
 
       for (const doc of form.docs) {
+        doc.deletedAt = new Date();
+        const cond = yield opts.routeHooks.delete.cond(_.pick(doc, ['id']), ctx, {
+          name
+        });
         const ret = yield Model.update(_.pick(doc, ['deletedAt']), {
-          where: {
-            id: doc.id
-          }
+          where: cond
         });
         results.push(ret);
       }
@@ -245,10 +243,12 @@ function () {
       const results = [];
 
       for (const doc of form.docs) {
+        const cond = yield opts.routeHooks.update.cond(_.pick(doc, ['id']), ctx, {
+          name
+        });
+        doc.updatedAt = new Date();
         const ret = yield Model.update(doc, {
-          where: {
-            id: doc.id
-          },
+          where: cond,
           fields: Object.keys(doc)
         });
         results.push(ret);

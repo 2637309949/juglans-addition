@@ -29,7 +29,7 @@ function () {
       const cond = yield opts.routeHooks.one.cond(_.assign(q.cond, {
         _id: id,
         deletedAt: null
-      }), {
+      }), ctx, {
         name
       });
       const query = Model.findOne(cond, q.project);
@@ -64,7 +64,7 @@ function () {
       const Model = ext.Model(name);
       const cond = yield opts.routeHooks.list.cond(_.assign(q.cond, {
         deletedAt: null
-      }), {
+      }), ctx, {
         name
       });
       let query = Model.find(cond, q.project).sort(q.sort);
@@ -123,9 +123,9 @@ function () {
     try {
       const Model = ext.Model(name);
       let form = ctx.request.body;
-      form.docs.forEach(doc => {
-        delete doc.createdAt;
-        delete doc.updatedAt;
+      form.docs = form.docs.map(x => {
+        x.createdAt = new Date();
+        return x;
       });
       form = yield opts.routeHooks.create.form(form, {
         name
@@ -166,26 +166,34 @@ function () {
         }
       }
 
-      form.docs.forEach(doc => {
-        delete doc.createdAt;
-        delete doc.updatedAt;
-        doc.deletedAt = new Date();
-      });
       form = yield opts.routeHooks.delete.form(form, {
         name
       });
       ctx.status = 200;
-      ctx.body = yield Model.bulkWrite(form.docs.map(doc => {
-        return {
-          updateOne: {
-            filter: _.pick(doc, ['_id']),
-            update: {
-              $set: _.pick(doc, ['deletedAt'])
-            },
-            upsert: false
-          }
+      const docs = yield Promise.all(form.docs.map(
+      /*#__PURE__*/
+      function () {
+        var _ref5 = _asyncToGenerator(function* (doc) {
+          const cond = yield opts.routeHooks.delete.cond(_.pick(doc, ['_id']), ctx, {
+            name
+          });
+          doc.deletedAt = new Date();
+          return {
+            updateOne: {
+              filter: cond,
+              update: {
+                $set: _.pick(doc, ['deletedAt'])
+              },
+              upsert: false
+            }
+          };
+        });
+
+        return function (_x17) {
+          return _ref5.apply(this, arguments);
         };
-      }));
+      }()));
+      ctx.body = yield Model.bulkWrite(docs);
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -203,7 +211,7 @@ function () {
 repo.update =
 /*#__PURE__*/
 function () {
-  var _ref5 = _asyncToGenerator(function* (name, ctx, ext, opts) {
+  var _ref6 = _asyncToGenerator(function* (name, ctx, ext, opts) {
     try {
       let form = ctx.request.body;
 
@@ -218,28 +226,35 @@ function () {
         }
       }
 
-      form.docs.forEach(doc => {
-        delete doc.createdAt;
-        delete doc.updatedAt;
-      });
       form = yield opts.routeHooks.update.form(form, {
         name
       });
       const Model = ext.Model(name);
       ctx.status = 200;
-      ctx.body = yield Model.bulkWrite(form.docs.map(x => {
-        return {
-          updateOne: {
-            filter: {
-              _id: x._id
-            },
-            update: {
-              $set: x
-            },
-            upsert: false
-          }
+      const docs = yield Promise.all(form.docs.map(
+      /*#__PURE__*/
+      function () {
+        var _ref7 = _asyncToGenerator(function* (x) {
+          const cond = yield opts.routeHooks.update.cond(_.pick(x, ['_id']), ctx, {
+            name
+          });
+          x.updatedAt = new Date();
+          return {
+            updateOne: {
+              filter: cond,
+              update: {
+                $set: x
+              },
+              upsert: false
+            }
+          };
+        });
+
+        return function (_x22) {
+          return _ref7.apply(this, arguments);
         };
-      }));
+      }()));
+      ctx.body = yield Model.bulkWrite(docs);
     } catch (error) {
       logger.error(error.stack || error.message);
       ctx.status = 500;
@@ -249,7 +264,7 @@ function () {
     }
   });
 
-  return function (_x17, _x18, _x19, _x20) {
-    return _ref5.apply(this, arguments);
+  return function (_x18, _x19, _x20, _x21) {
+    return _ref6.apply(this, arguments);
   };
 }();
