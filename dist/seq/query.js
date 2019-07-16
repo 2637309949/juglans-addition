@@ -108,8 +108,7 @@ Query.prototype.buildPopulate = function (model) {
   if (this.query.populate && this.query.populate.trim()) {
     const associations = utils.associations(model);
     this.populate = this.query.populate.trim().split(',').filter(x => !!x).map(x => x.trim()).map(x => {
-      const assoc = associations.find(as => as.foreignKey === x);
-      return assoc;
+      return associations.find(as => as.as === x);
     }).filter(x => !!x).map(x => ({
       model: x.model,
       as: x.as
