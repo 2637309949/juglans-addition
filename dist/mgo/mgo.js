@@ -54,6 +54,12 @@ function Ext(_ref) {
 
 repo.Ext.prototype.Docs = function () {
   return _.flatMap(this.m, x => x.docs);
+};
+
+repo.Ext.prototype.Init = function (init) {
+  assert.ok(is.function(init), 'init can not be empty!');
+  init(this);
+  return this;
 }; // Register model
 
 
@@ -64,7 +70,8 @@ repo.Ext.prototype.Register = function () {
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
   schema.docs = [];
   this.m.push(schema);
-  return this.mgo.model(schema.name, schema.schema);
+  this.mgo.model(schema.name, schema.schema);
+  return this;
 }; // Register model and return model
 
 

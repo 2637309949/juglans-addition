@@ -42,7 +42,7 @@ function () {
         cond.attributes = q.project;
       }
 
-      cond.include = q.populate;
+      cond.include = q.preload;
       ctx.status = 200;
       ctx.body = yield Model.findOne(cond);
     } catch (error) {
@@ -86,8 +86,8 @@ function () {
         match.attributes = q.project;
       }
 
-      if (q.populate.length > 0) {
-        match.include = q.populate;
+      if (q.preload.length > 0) {
+        match.include = q.preload;
       }
 
       if (q.range === 'PAGE') {

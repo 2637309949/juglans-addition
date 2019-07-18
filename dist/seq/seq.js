@@ -63,6 +63,12 @@ function Ext(_ref) {
 
 repo.Ext.prototype.Docs = function () {
   return _.flatMap(this.m, x => x.docs);
+};
+
+repo.Ext.prototype.Init = function (init) {
+  assert.ok(is.function(init), 'init can not be empty!');
+  init(this);
+  return this;
 }; // Register model and return model
 
 
@@ -80,7 +86,8 @@ repo.Ext.prototype.Register = function () {
   schema.docs = [];
   this.m.push(schema);
   opts = merge.all([opts, repo.Ext.defaultRegisterOpts]);
-  return this.sequelize.define(schema.name, schema.schema, opts);
+  this.sequelize.define(schema.name, schema.schema, opts);
+  return this;
 }; // Register model and return model
 
 

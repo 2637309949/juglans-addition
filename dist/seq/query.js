@@ -14,7 +14,7 @@ function Query(_ref) {
     cond = '%7B%7D',
     sort = '-_createdAt',
     project = '',
-    populate = '',
+    preload = '',
     page = 1,
     size = 20,
     range = 'PAGE'
@@ -25,7 +25,7 @@ function Query(_ref) {
       cond,
       sort,
       project,
-      populate,
+      preload,
       page,
       size,
       range
@@ -37,7 +37,7 @@ function Query(_ref) {
       cond,
       sort,
       project,
-      populate,
+      preload,
       page,
       size,
       range
@@ -46,7 +46,7 @@ function Query(_ref) {
     this.operators = {};
     this.sort = {};
     this.project = [];
-    this.populate = [];
+    this.preload = [];
     this.page = parseInt(page);
     this.size = parseInt(size);
     this.range = range === 'ALL' ? 'ALL' : 'PAGE';
@@ -66,7 +66,7 @@ Query.prototype.build = function (_ref2) {
   this.buildCond();
   this.buildSort();
   this.buildProject();
-  this.buildPopulate(model);
+  this.buildPreload(model);
   return this;
 };
 
@@ -104,10 +104,10 @@ Query.prototype.buildProject = function () {
   }
 };
 
-Query.prototype.buildPopulate = function (model) {
-  if (this.query.populate && this.query.populate.trim()) {
+Query.prototype.buildPreload = function (model) {
+  if (this.query.preload && this.query.preload.trim()) {
     const associations = utils.associations(model);
-    this.populate = this.query.populate.trim().split(',').filter(x => !!x).map(x => x.trim()).map(x => {
+    this.preload = this.query.preload.trim().split(',').filter(x => !!x).map(x => x.trim()).map(x => {
       return associations.find(as => as.as === x);
     }).filter(x => !!x).map(x => ({
       model: x.model,
