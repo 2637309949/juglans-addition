@@ -2,7 +2,7 @@
   "name": "juglans-addition",
   "version": "1.0.3",
   "description": "",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "lint": "eslint --ext .js lib",
     "build": "babel lib --ignore **/template --out-dir dist --copy-files",
@@ -64,6 +64,7 @@
     "moment": "^2.24.0",
     "mongoose": "^5.4.12",
     "mysql2": "^1.6.5",
+    "pluralize": "^8.0.0",
     "sequelize": "^5.8.12",
     "winston": "^3.2.1"
   }

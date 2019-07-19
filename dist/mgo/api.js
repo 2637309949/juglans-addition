@@ -333,7 +333,7 @@ repo.Api.defaultOpts = {
         prefix = `${prefix}${api.featurePrefix}`;
       }
 
-      return `${prefix}/${name}/:id`;
+      return `${prefix}/${name.toLowerCase()}/:id`;
     },
     list: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -347,7 +347,7 @@ repo.Api.defaultOpts = {
         prefix = `${prefix}${api.featurePrefix}`;
       }
 
-      return `${prefix}/${name}`;
+      return `${prefix}/${name.toLowerCase()}`;
     },
     create: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -361,7 +361,7 @@ repo.Api.defaultOpts = {
         prefix = `${prefix}${api.featurePrefix}`;
       }
 
-      return `${prefix}/${name}`;
+      return `${prefix}/${name.toLowerCase()}`;
     },
     update: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -375,7 +375,7 @@ repo.Api.defaultOpts = {
         prefix = `${prefix}${api.featurePrefix}`;
       }
 
-      return `${prefix}/${name}`;
+      return `${prefix}/${name.toLowerCase()}`;
     },
     delete: function (name) {
       let api = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -389,7 +389,7 @@ repo.Api.defaultOpts = {
         prefix = `${prefix}${api.featurePrefix}`;
       }
 
-      return `${prefix}/${name}`;
+      return `${prefix}/${name.toLowerCase()}`;
     }
   },
   routeHooks: {

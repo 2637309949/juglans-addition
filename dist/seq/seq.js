@@ -5,6 +5,8 @@
 // license that can be found in the LICENSE file.
 const Sequelize = require('sequelize');
 
+const pluralize = require('pluralize');
+
 const assert = require('assert');
 
 const is = require('is');
@@ -86,6 +88,11 @@ repo.Ext.prototype.Register = function () {
   schema.docs = [];
   this.m.push(schema);
   opts = merge.all([opts, repo.Ext.defaultRegisterOpts]);
+
+  if (!opts.tableName) {
+    opts.tableName = pluralize(schema.name.toLowerCase());
+  }
+
   this.sequelize.define(schema.name, schema.schema, opts);
   return this;
 }; // Register model and return model
