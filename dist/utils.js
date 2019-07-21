@@ -12,7 +12,7 @@ repo.formatLogArguments = function formatLogArguments(args) {
   var stackInfo = getStackInfo(1);
 
   if (stackInfo) {
-    var calleeStr = '(' + stackInfo.relativePath + ':' + stackInfo.line + ')';
+    var calleeStr = '(' + stackInfo.absolutePath + ':' + stackInfo.line + ')';
 
     if (typeof args[0] === 'string') {
       args[0] = calleeStr + ' ' + args[0];
@@ -34,7 +34,7 @@ function getStackInfo(stackIndex) {
   if (sp && sp.length === 5) {
     return {
       method: sp[1],
-      relativePath: path.relative(__filename, sp[2]),
+      absolutePath: sp[2],
       line: sp[3],
       pos: sp[4],
       file: path.basename(sp[2]),
