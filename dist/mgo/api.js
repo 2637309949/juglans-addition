@@ -417,22 +417,22 @@ repo.Api.defaultOpts = {
     },
     create: {
       form: function () {
-        var _ref9 = _asyncToGenerator(function* (_form, opts) {
+        var _ref9 = _asyncToGenerator(function* (_form, ctx, opts) {
           return _form;
         });
 
-        return function form(_x12, _x13) {
+        return function form(_x12, _x13, _x14) {
           return _ref9.apply(this, arguments);
         };
       }()
     },
     delete: {
       form: function () {
-        var _ref10 = _asyncToGenerator(function* (_form2, opts) {
+        var _ref10 = _asyncToGenerator(function* (_form2, ctx, opts) {
           return _form2;
         });
 
-        return function form(_x14, _x15) {
+        return function form(_x15, _x16, _x17) {
           return _ref10.apply(this, arguments);
         };
       }(),
@@ -441,18 +441,18 @@ repo.Api.defaultOpts = {
           return _cond3;
         });
 
-        return function cond(_x16, _x17, _x18) {
+        return function cond(_x18, _x19, _x20) {
           return _ref11.apply(this, arguments);
         };
       }()
     },
     update: {
       form: function () {
-        var _ref12 = _asyncToGenerator(function* (_form3, opts) {
+        var _ref12 = _asyncToGenerator(function* (_form3, ctx, opts) {
           return _form3;
         });
 
-        return function form(_x19, _x20) {
+        return function form(_x21, _x22, _x23) {
           return _ref12.apply(this, arguments);
         };
       }(),
@@ -461,7 +461,7 @@ repo.Api.defaultOpts = {
           return _cond4;
         });
 
-        return function cond(_x21, _x22, _x23) {
+        return function cond(_x24, _x25, _x26) {
           return _ref13.apply(this, arguments);
         };
       }()

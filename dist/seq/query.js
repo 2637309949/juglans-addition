@@ -64,17 +64,26 @@ Query.prototype.build = function (_ref2) {
   this.size = this.query.size;
   this.range = this.query.range;
   this.buildCond();
+  this.toOperators();
   this.buildSort();
   this.buildProject();
   this.buildPreload(model);
   return this;
 };
 
+Query.prototype.toOperators = function () {
+  try {
+    this.operators = utils.toOperators(this.cond);
+  } catch (error) {
+    logger.error(error.stack || error.message);
+    throw error;
+  }
+};
+
 Query.prototype.buildCond = function () {
   try {
     if (is.string(this.query.cond)) {
       this.cond = JSON.parse(decodeURIComponent(this.query.cond));
-      this.operators = utils.toOperators(this.cond);
     }
   } catch (error) {
     logger.error(error.stack || error.message);

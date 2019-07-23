@@ -31,11 +31,12 @@ function () {
       q.cond = yield opts.routeHooks.one.cond(_.assign(q.cond, {
         id,
         deletedAt: null
-      }), {
+      }), ctx, {
         name
       });
+      q.toOperators();
       const cond = {
-        where: q.cond
+        where: q.operators
       };
 
       if (q.project.length > 0) {
@@ -70,17 +71,15 @@ function () {
       const q = Query(ctx.query).build({
         model: Model
       });
-      q.cond = _.assign(q.cond, {
+      q.cond = yield opts.routeHooks.list.cond(_.assign(q.cond, {
         deletedAt: null
+      }), ctx, {
+        name
       });
+      q.toOperators();
       const match = {
         where: q.operators
       };
-      match.where = yield opts.routeHooks.list.cond(_.assign(match.where, {
-        deletedAt: null
-      }), {
-        name
-      });
 
       if (q.project.length > 0) {
         match.attributes = q.project;
@@ -148,7 +147,7 @@ function () {
         doc.createdAt = new Date();
         return doc;
       });
-      form = yield opts.routeHooks.create.form(form, {
+      form = yield opts.routeHooks.create.form(form, ctx, {
         name
       });
       ctx.status = 200;
