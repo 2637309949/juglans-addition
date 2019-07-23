@@ -25,7 +25,7 @@ const format = combine(colorize(), timestamp(), printf((_ref) => {
 // performance concerns, maybe
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: 'silly',
   format,
   transports: [new winston.transports.Console({
     format
