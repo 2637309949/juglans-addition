@@ -45,6 +45,12 @@ logger.info = function (info) {
   };
 }(logger.info);
 
+logger.http = function (http) {
+  return function () {
+    http.apply(logger, utils.formatLogArguments(arguments));
+  };
+}(logger.http);
+
 logger.warn = function (warn) {
   return function () {
     warn.apply(logger, utils.formatLogArguments(arguments));
