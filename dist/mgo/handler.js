@@ -127,7 +127,7 @@ function () {
         x.createdAt = new Date();
         return x;
       });
-      form = yield opts.routeHooks.create.form(form, {
+      form = yield opts.routeHooks.create.form(form, ctx, {
         name
       });
       ctx.status = 200;
