@@ -12,6 +12,8 @@
         - [Create addition](#create-addition-1)
         - [Use as plugin](#use-as-plugin-1)
         - [Custom default api if you need](#custom-default-api-if-you-need-1)
+    - [logger](#logger)
+        - [Add transport](#add-transport)
     - [redis addition](#redis-addition)
     - [apidoc](#apidoc)
         - [Install apidoc](#install-apidoc)
@@ -121,6 +123,19 @@ module.exports = ({ router, events: e }) => {
   SeqExt.api.Create(router, 'user')
 }
 ```
+
+### logger
+
+#### Add transport
+
+```javascript
+// logger init
+repo.logger = logger
+  .add(new winston.transports.File({ filename: path.join(config.logger.path, 'error.log'), level: 'error', maxsize: config.logger.maxsize }))
+  .add(new winston.transports.File({ filename: path.join(config.logger.path, 'combined.log'), maxsize: config.logger.maxsize }))
+```
+![Juglans logger](./asserts/logger.png)
+
 
 ### redis addition
 
