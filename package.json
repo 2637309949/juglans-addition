@@ -2,7 +2,7 @@
   "name": "juglans-addition",
   "version": "1.0.5",
   "description": "",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "lint": "eslint --ext .js lib",
     "build": "babel lib --ignore **/template --out-dir dist --copy-files",

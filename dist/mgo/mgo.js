@@ -17,6 +17,8 @@ const api = require('./api');
 
 const model = require('./model');
 
+const logger = require('../logger');
+
 const repo = module.exports;
 repo.mongoose = mongoose;
 repo.Ext = Ext;
@@ -28,6 +30,12 @@ repo.Ext.Connect = function (uri) {
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   opts = merge.all([opts, repo.Ext.defaultConnectOpts]);
   const mgo = mongoose.createConnection(uri, opts);
+  mgo.on('connected', function (ref) {
+    logger.info('mongo:Connection has been established successfully');
+  });
+  mgo.on('error', function (err) {
+    logger.error('mongo:Failed to established', err);
+  });
   return new Ext({
     mgo
   });

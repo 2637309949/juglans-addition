@@ -34,9 +34,9 @@ repo.Ext.Connect = function (uri) {
   opts = merge.all([opts, repo.Ext.defaultConnectOpts]);
   const sequelize = new Sequelize(uri, opts);
   sequelize.authenticate().then(() => {
-    logger.info('Connection has been established successfully');
+    logger.info('seq:Connection has been established successfully');
   }).catch(err => {
-    logger.error('Unable to connect to the database:', err);
+    logger.error('seq:Failed to established', err);
   });
   return new Ext({
     sequelize,
