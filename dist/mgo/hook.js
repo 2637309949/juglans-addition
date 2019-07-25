@@ -7,6 +7,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // Copyright (c) 2018-2020 Double.  All rights reserved.
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
+const assert = require('assert');
+
+const is = require('is');
+
 const repo = module.exports;
 
 const authFailed = ctx => {
@@ -21,7 +25,8 @@ repo.Hook = function (_ref) {
     handler,
     pre,
     post,
-    auth
+    auth,
+    routeHooks
   } = _ref;
 
   if (!(this instanceof repo.Hook)) {
@@ -29,7 +34,8 @@ repo.Hook = function (_ref) {
       handler,
       pre,
       post,
-      auth
+      auth,
+      routeHooks
     });
   }
 
@@ -38,6 +44,7 @@ repo.Hook = function (_ref) {
   this.post = post;
   this.auth = auth;
   this.handler = handler;
+  this.routeHooks = routeHooks;
 }; // Wrap spec model router with pre and post hooks
 
 
@@ -80,7 +87,7 @@ repo.Hook.prototype.route = function () {
 
 
 repo.Hook.prototype.Pre = function (pre) {
-  if (pre) {
+  if (is.function(pre)) {
     this.pre = pre;
   }
 
@@ -89,7 +96,7 @@ repo.Hook.prototype.Pre = function (pre) {
 
 
 repo.Hook.prototype.Post = function (post) {
-  if (post) {
+  if (is.function(post)) {
     this.post = post;
   }
 
@@ -98,8 +105,19 @@ repo.Hook.prototype.Post = function (post) {
 
 
 repo.Hook.prototype.Auth = function (auth) {
-  if (auth) {
+  if (is.function(auth)) {
     this.auth = auth;
+  }
+
+  return this;
+}; // Auth hook for after exec spec model router
+
+
+repo.Hook.prototype.RouteHooks = function (hooks) {
+  assert.ok(is.object(hooks), 'hooks can not be empty!');
+
+  if (hooks && this.routeHooks) {
+    this.routeHooks(hooks);
   }
 
   return this;

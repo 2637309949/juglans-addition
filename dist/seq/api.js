@@ -75,6 +75,9 @@ repo.Api.prototype.One = function (router, name) {
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
+    routeHooks: hooks => {
+      opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+    },
     handler: ctx => handler.one(name, ctx, this.ext, opts)
   });
 
@@ -100,6 +103,10 @@ repo.Api.prototype.List = function (router, name) {
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
+    routeHooks: hooks => {
+      opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+      console.log('opts.routeHooks = ', opts.routeHooks);
+    },
     handler: ctx => handler.list(name, ctx, this.ext, opts)
   });
 
@@ -125,6 +132,9 @@ repo.Api.prototype.Create = function (router, name) {
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
+    routeHooks: hooks => {
+      opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+    },
     handler: ctx => handler.create(name, ctx, this.ext, opts)
   });
 
@@ -150,6 +160,9 @@ repo.Api.prototype.Update = function (router, name) {
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
+    routeHooks: hooks => {
+      opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+    },
     handler: ctx => handler.update(name, ctx, this.ext, opts)
   });
 
@@ -175,6 +188,9 @@ repo.Api.prototype.Delete = function (router, name) {
     pre: optHook.pre,
     post: optHook.post,
     auth: optHook.auth,
+    routeHooks: hooks => {
+      opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+    },
     handler: ctx => handler.delete(name, ctx, this.ext, opts)
   });
 
@@ -197,7 +213,11 @@ repo.Api.prototype.ALL = function (router, name) {
 
   const profile = this.ext.Profile(name);
   const opts = merge.all([this.opts, _.get(profile, 'opts', {})]);
-  const h = hook.Hook({});
+  const h = hook.Hook({
+    routeHooks: hooks => {
+      opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+    }
+  });
 
   for (var _len6 = arguments.length, middles = new Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
     middles[_key6 - 2] = arguments[_key6];
@@ -212,6 +232,9 @@ repo.Api.prototype.ALL = function (router, name) {
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
+        routeHooks: hooks => {
+          opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+        },
         handler: ctx => handler.one(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
@@ -233,6 +256,9 @@ repo.Api.prototype.ALL = function (router, name) {
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
+        routeHooks: hooks => {
+          opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+        },
         handler: ctx => handler.list(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
@@ -254,6 +280,9 @@ repo.Api.prototype.ALL = function (router, name) {
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
+        routeHooks: hooks => {
+          opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+        },
         handler: ctx => handler.create(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
@@ -275,6 +304,9 @@ repo.Api.prototype.ALL = function (router, name) {
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
+        routeHooks: hooks => {
+          opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+        },
         handler: ctx => handler.update(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
@@ -296,6 +328,9 @@ repo.Api.prototype.ALL = function (router, name) {
         pre: optHook.pre,
         post: optHook.post,
         auth: optHook.auth,
+        routeHooks: hooks => {
+          opts.routeHooks = merge.all([opts.routeHooks, hooks]);
+        },
         handler: ctx => handler.delete(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
