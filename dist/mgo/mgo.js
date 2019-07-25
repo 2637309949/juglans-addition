@@ -108,7 +108,7 @@ repo.Ext.defaultSchemaOpts = {
   }
 };
 
-repo.Ext.prototype.Define = function (schema) {
+repo.Ext.prototype.Schema = function (schema) {
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   return new mongoose.Schema(schema, merge.all([opts, repo.Ext.defaultSchemaOpts]));
 }; // shortcut for sequelize model
