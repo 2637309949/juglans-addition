@@ -50,7 +50,8 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: 'Internal Server Error'
+        message: 'Internal Server Error',
+        stack: error.stack || error.message
       };
     }
   });
@@ -126,7 +127,8 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: 'Internal Server Error'
+        message: 'Internal Server Error',
+        stack: error.stack || error.message
       };
     }
   });
@@ -156,7 +158,8 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: error.message
+        message: error.message,
+        stack: error.stack || error.message
       };
     }
   });
@@ -178,10 +181,7 @@ function () {
         const doc = form.docs[index];
 
         if (doc['id'] === undefined || doc['id'] === '' || doc['id'] === null) {
-          ctx.body = {
-            message: 'no id found'
-          };
-          return;
+          throw new Error('no id found');
         }
       }
 
@@ -207,7 +207,8 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: 'Internal Server Error'
+        message: 'Internal Server Error',
+        stack: error.stack || error.message
       };
     }
   });
@@ -229,10 +230,7 @@ function () {
         const doc = form.docs[index];
 
         if (doc['id'] === undefined || doc['id'] === '' || doc['id'] === null) {
-          ctx.body = {
-            message: 'no id found'
-          };
-          return;
+          throw new Error('no id found');
         }
       }
 
@@ -259,7 +257,8 @@ function () {
       logger.error(error.stack || error.message);
       ctx.status = 500;
       ctx.body = {
-        message: 'Internal Server Error'
+        message: 'Internal Server Error',
+        stack: error.stack || error.message
       };
     }
   });

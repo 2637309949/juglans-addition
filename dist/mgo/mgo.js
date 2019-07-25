@@ -72,13 +72,31 @@ repo.Ext.prototype.Init = function (init) {
 
 
 repo.Ext.prototype.Register = function () {
+  var _this$mgo;
+
   let schema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   assert.ok(is.string(schema.name), 'name can not be empty!');
   assert.ok(is.object(schema.schema), 'schema can not be empty!');
   schema.docs = [];
+  const optsList = [];
+
+  if (opts.collection) {
+    optsList.push(opts.collection);
+  }
+
+  if (opts.skipInit) {
+    if (!opts.collection) {
+      optsList.push(null);
+    }
+
+    optsList.push(opts.skipInit);
+  }
+
   this.m.push(schema);
-  this.mgo.model(schema.name, schema.schema);
+
+  (_this$mgo = this.mgo).model.apply(_this$mgo, [schema.name, schema.schema].concat(optsList));
+
   return this;
 }; // Register model and return model
 
@@ -90,10 +108,9 @@ repo.Ext.defaultSchemaOpts = {
   }
 };
 
-repo.Ext.prototype.DefineSchema = function (schema) {
+repo.Ext.prototype.Define = function (schema) {
   let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  opts = merge.all([opts, repo.Ext.defaultSchemaOpts]);
-  return new mongoose.Schema(_.assign(schema, repo.Ext.Model), opts);
+  return new mongoose.Schema(schema, merge.all([opts, repo.Ext.defaultSchemaOpts]));
 }; // shortcut for sequelize model
 
 

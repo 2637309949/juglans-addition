@@ -98,12 +98,9 @@ repo.Ext.prototype.Register = function () {
 }; // Register model and return model
 
 
-repo.Ext.prototype.DefineSchema = function () {
-  for (var _len = arguments.length, schema = new Array(_len), _key = 0; _key < _len; _key++) {
-    schema[_key] = arguments[_key];
-  }
-
-  return Object.assign.apply(Object, [{}, model].concat(schema));
+repo.Ext.prototype.Define = function (schema) {
+  let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  return _.assign(schema);
 }; // shortcut for sequelize model
 
 
