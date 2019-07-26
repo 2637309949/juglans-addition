@@ -105,7 +105,6 @@ repo.Api.prototype.List = function (router, name) {
     auth: optHook.auth,
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
-      console.log('opts.routeHooks = ', opts.routeHooks);
     },
     handler: ctx => handler.list(name, ctx, this.ext, opts)
   });
