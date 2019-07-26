@@ -8,10 +8,18 @@
         - [Create addition](#create-addition)
         - [Use as plugin](#use-as-plugin)
         - [Custom default api if you need](#custom-default-api-if-you-need)
+        - [Defined your config](#defined-your-config)
+            - [Global](#global)
+            - [Profile](#profile)
+            - [Code](#code)
     - [sequelize addition](#sequelize-addition)
         - [Create addition](#create-addition-1)
         - [Use as plugin](#use-as-plugin-1)
         - [Custom default api if you need](#custom-default-api-if-you-need-1)
+        - [Defined your config](#defined-your-config-1)
+            - [Global](#global-1)
+            - [Profile](#profile-1)
+            - [Code](#code-1)
     - [logger](#logger)
         - [Add transport](#add-transport)
     - [redis addition](#redis-addition)
@@ -73,6 +81,46 @@ module.exports = function ({ router }) {
   mgoExt.api.Create(router, 'User')
 }
 ```
+#### Defined your config
+	Configure the priority levels
+		Global < Profile < Code
+##### Global
+```javascript
+repo.mongoose = mgo.mongoose
+repo.mgoExt = mgo.Ext.Connect(config.mongo.uri, config.mongo.opts)
+repo.mgoExt.setApiOpts({
+  prefix: '/template/mgo'
+})
+```
+##### Profile
+```javascript
+mgoExt.Register({
+  name: 'User',
+  displayName: '参数配置',
+  schema,
+  opts: {
+    routeHooks: {
+      list: {
+        cond: async function (cond, ctx, opts) {
+          return cond
+        }
+      }
+    }
+  },
+  autoHook: false
+})
+```
+
+##### Code
+```javascript
+mgoExt.api.List(router, 'User')
+  .Pre(async function (ctx) {
+    console.log('before')
+  })
+  .Post(async function (ctx) {
+    console.log('after')
+  })
+```
 
 ### sequelize addition
 
@@ -122,6 +170,95 @@ module.exports = ({ router, events: e }) => {
   SeqExt.api.Update(router, 'user')
   SeqExt.api.Create(router, 'user')
 }
+```
+#### Defined your config
+	Configure the priority levels
+		Global < Profile < Code
+##### Global
+```javascript
+repo.SeqExt.setApiOpts({
+  prefix: '/template/seq',
+  routeHooks: {
+    one: {
+      cond: function (cond, ctx, info) {
+        const token = ctx.state['token']
+        if (token) {
+          cond._creator = token.extra.id
+        }
+        return cond
+      }
+    },
+    list: {
+      cond: function (cond, ctx, info) {
+        const token = ctx.state['token']
+        if (token) {
+          cond._creator = token.extra.id
+        }
+        return cond
+      }
+    },
+    create: {
+      form: function (form, ctx, info) {
+        const token = ctx.state['token']
+        if (token) {
+          form._creator = token.extra.id
+        }
+        return form
+      }
+    },
+    delete: {
+      cond: function (cond, ctx, info) {
+        const token = ctx.state['token']
+        if (token) {
+          cond._creator = token.extra.id
+        }
+        return cond
+      }
+    },
+    update: {
+      cond: function (cond, ctx, info) {
+        const token = ctx.state['token']
+        if (token) {
+          cond._creator = token.extra.id
+        }
+        return cond
+      }
+    }
+  }
+})
+```
+##### Profile
+```javascript
+SeqExt.Register({
+  name: 'User',
+  displayName: '用户',
+  autoHook: false,
+  schema,
+  opts: {
+    routeHooks: {
+      list: {
+        pre (ctx) {
+          logger.info('User model pre hook')
+        }
+      }
+    }
+  }
+})
+```
+##### Code
+```javascript
+SeqExt.api.List(router, 'User')
+  .Post(async function (ctx) {
+    logger.info('User model post hook')
+  })
+  .Auth(ctx => true)
+  .RouteHooks({
+    list: {
+      cond: function (cond, ctx, info) {
+        return cond
+      }
+    }
+  })
 ```
 
 ### logger
