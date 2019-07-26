@@ -127,7 +127,6 @@ mgoExt.api.List(router, 'User')
 #### Create addition
 
 ```javascript
-// sequelize init
 repo.Sequelize = seq.Sequelize
 repo.SeqExt = seq.Ext.Connect(config.sql.uri, config.sql.opts)
 repo.SeqExt.setApiOpts({
@@ -264,12 +263,17 @@ SeqExt.api.List(router, 'User')
 ### logger
 
 #### Add transport
-
 ```javascript
-// logger init
 repo.logger = logger
-  .add(new winston.transports.File({ filename: path.join(config.logger.path, 'error.log'), level: 'error', maxsize: config.logger.maxsize }))
-  .add(new winston.transports.File({ filename: path.join(config.logger.path, 'combined.log'), maxsize: config.logger.maxsize }))
+  .add(new winston.transports.File({
+    filename: path.join(config.logger.path, 'error.log'),
+    level: 'error',
+    maxsize: config.logger.maxsize
+  }))
+  .add(new winston.transports.File({
+    filename: path.join(config.logger.path, 'combined.log'),
+    maxsize: config.logger.maxsize
+  }))
 ```
 ![Juglans logger](./asserts/logger.png)
 
