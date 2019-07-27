@@ -54,6 +54,7 @@ repo.Api.prototype.Feature = function () {
     };
   }
 
+  opts.prefix = this.opts.prefix;
   opts.featurePrefix = `${this.opts.featurePrefix}${opts.featurePrefix}`;
   return repo.Api({
     ext: this.ext
