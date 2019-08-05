@@ -22,3 +22,5 @@ node_modules
 **/template/api_data_sys.json
 **/template/api_data.js
 **/template/api_data.json
+dist/apidoc/template/api_data_sys.js
+dist/apidoc/template/api_project.js

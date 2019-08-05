@@ -19,7 +19,9 @@ const hook = require('./hook');
 
 const doc = require('./doc');
 
-const repo = module.exports;
+const repo = module.exports; // Api defined api for api default
+// ,, ext ref mongoExt
+// ,, opts defined api routes or api prefix
 
 repo.Api = function (_ref) {
   let {
@@ -35,13 +37,19 @@ repo.Api = function (_ref) {
 
   this.ext = ext;
   this.opts = merge.all([repo.Api.defaultOpts, opts]);
-};
+}; // setApiOpts defined set opts from ext
+// all opts level
+// code > conf > global
+
 
 repo.Api.prototype.setApiOpts = function () {
   let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   this.opts = merge.all([this.opts, opts]);
   return this;
-};
+}; // Feature defined return new Api
+// ,, prefix inheritance opts.prefix
+// ,, featurePrefix inheritance opts.featurePrefix + featurePrefix
+
 
 repo.Api.prototype.Feature = function () {
   let opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
@@ -59,14 +67,19 @@ repo.Api.prototype.Feature = function () {
   return repo.Api({
     ext: this.ext
   }, opts);
-};
+}; // Name defined replace featurePrefix with new name
+
 
 repo.Api.prototype.Name = function (name) {
   this.opts = merge.all([this.opts, {
     featurePrefix: `/${name}`
   }]);
   return this;
-};
+}; // One defined query for one item
+// ,, Pre hook defined pre One
+// ,, Post hook defined post One
+// ,, Auth hook defined auth One
+
 
 repo.Api.prototype.One = function (router, name) {
   const profile = this.ext.Profile(name);
