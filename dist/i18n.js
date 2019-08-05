@@ -133,12 +133,13 @@ I18N.prototype.i18nLocale = function (str) {
   return this.getLocale(this.locale)[str] || str;
 };
 
+const localeKey = 'locale';
 I18N.defaultOpts = {
   prefix: '/i18n',
 
   ctxLocale(ctx) {
     return _asyncToGenerator(function* () {
-      return ctx.query.locale;
+      return ctx.query[localeKey] || ctx.Request.body[localeKey] || ctx.cookies.get(localeKey) || ctx.get(localeKey);
     })();
   }
 
