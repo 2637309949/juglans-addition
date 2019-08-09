@@ -21,31 +21,22 @@ repo.one =
 /*#__PURE__*/
 function () {
   var _ref = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      const key = utils.findStringSubmatch(/:(.*)$/, opts.routePrefixs.one(name, opts));
-      const id = ctx.params[key[0]];
-      const Model = ext.Model(name);
-      const q = Query(ctx.query).build();
-      const cond = yield opts.routeHooks.one.cond(_.assign(q.cond, {
-        _id: id,
-        deletedAt: null
-      }), ctx, {
-        name
-      });
-      const query = Model.findOne(cond, q.project);
-      q.populate.forEach(pop => {
-        query.populate(pop);
-      });
-      ctx.status = 200;
-      ctx.body = yield query.exec();
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
-      ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
-      };
-    }
+    const key = utils.findStringSubmatch(/:(.*)$/, opts.routePrefixs.one(name, opts));
+    const id = ctx.params[key[0]];
+    const Model = ext.Model(name);
+    const q = Query(ctx.query).build();
+    const cond = yield opts.routeHooks.one.cond(_.assign(q.cond, {
+      _id: id,
+      deletedAt: null
+    }), ctx, {
+      name
+    });
+    const query = Model.findOne(cond, q.project);
+    q.populate.forEach(pop => {
+      query.populate(pop);
+    });
+    ctx.status = 200;
+    ctx.body = yield query.exec();
   });
 
   return function (_x, _x2, _x3, _x4) {
@@ -57,58 +48,49 @@ repo.list =
 /*#__PURE__*/
 function () {
   var _ref2 = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      let totalpages;
-      let totalrecords;
-      let result;
-      const q = Query(ctx.query).build();
-      const Model = ext.Model(name);
-      const cond = yield opts.routeHooks.list.cond(_.assign(q.cond, {
-        deletedAt: null
-      }), ctx, {
-        name
-      });
-      let query = Model.find(cond, q.project).sort(q.sort);
-      q.populate.forEach(pop => {
-        query.populate(pop);
-      });
+    let totalpages;
+    let totalrecords;
+    let result;
+    const q = Query(ctx.query).build();
+    const Model = ext.Model(name);
+    const cond = yield opts.routeHooks.list.cond(_.assign(q.cond, {
+      deletedAt: null
+    }), ctx, {
+      name
+    });
+    let query = Model.find(cond, q.project).sort(q.sort);
+    q.populate.forEach(pop => {
+      query.populate(pop);
+    });
 
-      if (q.range === 'PAGE') {
-        query = query.skip((q.page - 1) * q.size).limit(q.size);
-        result = yield query.exec();
-        totalrecords = yield Model.where(cond).countDocuments();
-        totalpages = Math.ceil(totalrecords / q.size);
-        ctx.status = 200;
-        ctx.body = {
-          cond: q.cond,
-          page: q.page,
-          size: q.size,
-          sort: q.sort,
-          project: q.project,
-          populate: q.populate,
-          totalpages,
-          totalrecords,
-          data: result
-        };
-      } else if (q.range === 'ALL') {
-        result = yield query.exec();
-        totalrecords = result.length;
-        ctx.status = 200;
-        ctx.body = {
-          cond: q.cond,
-          sort: q.sort,
-          project: q.project,
-          populate: q.populate,
-          totalrecords,
-          data: result
-        };
-      }
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
+    if (q.range === 'PAGE') {
+      query = query.skip((q.page - 1) * q.size).limit(q.size);
+      result = yield query.exec();
+      totalrecords = yield Model.where(cond).countDocuments();
+      totalpages = Math.ceil(totalrecords / q.size);
+      ctx.status = 200;
       ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
+        cond: q.cond,
+        page: q.page,
+        size: q.size,
+        sort: q.sort,
+        project: q.project,
+        populate: q.populate,
+        totalpages,
+        totalrecords,
+        data: result
+      };
+    } else if (q.range === 'ALL') {
+      result = yield query.exec();
+      totalrecords = result.length;
+      ctx.status = 200;
+      ctx.body = {
+        cond: q.cond,
+        sort: q.sort,
+        project: q.project,
+        populate: q.populate,
+        totalrecords,
+        data: result
       };
     }
   });
@@ -122,26 +104,17 @@ repo.create =
 /*#__PURE__*/
 function () {
   var _ref3 = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      const Model = ext.Model(name);
-      let form = ctx.request.body;
-      form.docs = form.docs.map(x => {
-        x.createdAt = new Date();
-        return x;
-      });
-      form = yield opts.routeHooks.create.form(form, ctx, {
-        name
-      });
-      ctx.status = 200;
-      ctx.body = yield Model.create(form.docs);
-    } catch (error) {
-      logger.error(error.stack);
-      ctx.status = 500;
-      ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
-      };
-    }
+    const Model = ext.Model(name);
+    let form = ctx.request.body;
+    form.docs = form.docs.map(x => {
+      x.createdAt = new Date();
+      return x;
+    });
+    form = yield opts.routeHooks.create.form(form, ctx, {
+      name
+    });
+    ctx.status = 200;
+    ctx.body = yield Model.create(form.docs);
   });
 
   return function (_x9, _x10, _x11, _x12) {
@@ -153,54 +126,45 @@ repo.delete =
 /*#__PURE__*/
 function () {
   var _ref4 = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      const Model = ext.Model(name);
-      let form = ctx.request.body;
+    const Model = ext.Model(name);
+    let form = ctx.request.body;
 
-      for (let index = 0; index < form.docs.length; index++) {
-        const doc = form.docs[index];
+    for (let index = 0; index < form.docs.length; index++) {
+      const doc = form.docs[index];
 
-        if (doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null) {
-          throw new Error('no id found');
-        }
+      if (doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null) {
+        throw new Error('no id found');
       }
-
-      form = yield opts.routeHooks.delete.form(form, {
-        name
-      });
-      ctx.status = 200;
-      const docs = yield Promise.all(form.docs.map(
-      /*#__PURE__*/
-      function () {
-        var _ref5 = _asyncToGenerator(function* (doc) {
-          const cond = yield opts.routeHooks.delete.cond(_.pick(doc, ['_id']), ctx, {
-            name
-          });
-          doc.deletedAt = new Date();
-          return {
-            updateOne: {
-              filter: cond,
-              update: {
-                $set: _.pick(doc, ['deletedAt'])
-              },
-              upsert: false
-            }
-          };
-        });
-
-        return function (_x17) {
-          return _ref5.apply(this, arguments);
-        };
-      }()));
-      ctx.body = yield Model.bulkWrite(docs);
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
-      ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
-      };
     }
+
+    form = yield opts.routeHooks.delete.form(form, {
+      name
+    });
+    ctx.status = 200;
+    const docs = yield Promise.all(form.docs.map(
+    /*#__PURE__*/
+    function () {
+      var _ref5 = _asyncToGenerator(function* (doc) {
+        const cond = yield opts.routeHooks.delete.cond(_.pick(doc, ['_id']), ctx, {
+          name
+        });
+        doc.deletedAt = new Date();
+        return {
+          updateOne: {
+            filter: cond,
+            update: {
+              $set: _.pick(doc, ['deletedAt'])
+            },
+            upsert: false
+          }
+        };
+      });
+
+      return function (_x17) {
+        return _ref5.apply(this, arguments);
+      };
+    }()));
+    ctx.body = yield Model.bulkWrite(docs);
   });
 
   return function (_x13, _x14, _x15, _x16) {
@@ -212,54 +176,45 @@ repo.update =
 /*#__PURE__*/
 function () {
   var _ref6 = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      let form = ctx.request.body;
+    let form = ctx.request.body;
 
-      for (let index = 0; index < form.docs.length; index++) {
-        const doc = form.docs[index];
+    for (let index = 0; index < form.docs.length; index++) {
+      const doc = form.docs[index];
 
-        if (doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null) {
-          throw new Error('no id found');
-        }
+      if (doc['_id'] === undefined || doc['_id'] === '' || doc['_id'] === null) {
+        throw new Error('no id found');
       }
-
-      form = yield opts.routeHooks.update.form(form, {
-        name
-      });
-      const Model = ext.Model(name);
-      ctx.status = 200;
-      const docs = yield Promise.all(form.docs.map(
-      /*#__PURE__*/
-      function () {
-        var _ref7 = _asyncToGenerator(function* (x) {
-          const cond = yield opts.routeHooks.update.cond(_.pick(x, ['_id']), ctx, {
-            name
-          });
-          x.updatedAt = new Date();
-          return {
-            updateOne: {
-              filter: cond,
-              update: {
-                $set: x
-              },
-              upsert: false
-            }
-          };
-        });
-
-        return function (_x22) {
-          return _ref7.apply(this, arguments);
-        };
-      }()));
-      ctx.body = yield Model.bulkWrite(docs);
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
-      ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
-      };
     }
+
+    form = yield opts.routeHooks.update.form(form, {
+      name
+    });
+    const Model = ext.Model(name);
+    ctx.status = 200;
+    const docs = yield Promise.all(form.docs.map(
+    /*#__PURE__*/
+    function () {
+      var _ref7 = _asyncToGenerator(function* (x) {
+        const cond = yield opts.routeHooks.update.cond(_.pick(x, ['_id']), ctx, {
+          name
+        });
+        x.updatedAt = new Date();
+        return {
+          updateOne: {
+            filter: cond,
+            update: {
+              $set: x
+            },
+            upsert: false
+          }
+        };
+      });
+
+      return function (_x22) {
+        return _ref7.apply(this, arguments);
+      };
+    }()));
+    ctx.body = yield Model.bulkWrite(docs);
   });
 
   return function (_x18, _x19, _x20, _x21) {

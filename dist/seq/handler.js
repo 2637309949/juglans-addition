@@ -21,39 +21,30 @@ repo.one =
 /*#__PURE__*/
 function () {
   var _ref = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      const key = utils.findStringSubmatch(/:(.*)$/, opts.routePrefixs.one(name, opts));
-      const id = ctx.params[key];
-      const Model = ext.Model(name);
-      const q = Query(ctx.query).build({
-        model: Model
-      });
-      q.cond = yield opts.routeHooks.one.cond(_.assign(q.cond, {
-        id,
-        deletedAt: null
-      }), ctx, {
-        name
-      });
-      q.toOperators();
-      const cond = {
-        where: q.operators
-      };
+    const key = utils.findStringSubmatch(/:(.*)$/, opts.routePrefixs.one(name, opts));
+    const id = ctx.params[key];
+    const Model = ext.Model(name);
+    const q = Query(ctx.query).build({
+      model: Model
+    });
+    q.cond = yield opts.routeHooks.one.cond(_.assign(q.cond, {
+      id,
+      deletedAt: null
+    }), ctx, {
+      name
+    });
+    q.toOperators();
+    const cond = {
+      where: q.operators
+    };
 
-      if (q.project.length > 0) {
-        cond.attributes = q.project;
-      }
-
-      cond.include = q.preload;
-      ctx.status = 200;
-      ctx.body = yield Model.findOne(cond);
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
-      ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
-      };
+    if (q.project.length > 0) {
+      cond.attributes = q.project;
     }
+
+    cond.include = q.preload;
+    ctx.status = 200;
+    ctx.body = yield Model.findOne(cond);
   });
 
   return function (_x, _x2, _x3, _x4) {
@@ -65,70 +56,61 @@ repo.list =
 /*#__PURE__*/
 function () {
   var _ref2 = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      let totalpages;
-      let totalrecords;
-      const Model = ext.Model(name);
-      const q = Query(ctx.query).build({
-        model: Model
-      });
-      q.cond = yield opts.routeHooks.list.cond(_.assign(q.cond, {
-        deletedAt: null
-      }), ctx, {
-        name
-      });
-      q.toOperators();
-      const match = {
-        where: q.operators
-      };
+    let totalpages;
+    let totalrecords;
+    const Model = ext.Model(name);
+    const q = Query(ctx.query).build({
+      model: Model
+    });
+    q.cond = yield opts.routeHooks.list.cond(_.assign(q.cond, {
+      deletedAt: null
+    }), ctx, {
+      name
+    });
+    q.toOperators();
+    const match = {
+      where: q.operators
+    };
 
-      if (q.project.length > 0) {
-        match.attributes = q.project;
-      }
+    if (q.project.length > 0) {
+      match.attributes = q.project;
+    }
 
-      if (q.preload.length > 0) {
-        match.include = q.preload;
-      }
+    if (q.preload.length > 0) {
+      match.include = q.preload;
+    }
 
-      if (q.range === 'PAGE') {
-        match.offset = (q.page - 1) * q.size;
-        match.limit = q.size;
-      }
+    if (q.range === 'PAGE') {
+      match.offset = (q.page - 1) * q.size;
+      match.limit = q.size;
+    }
 
-      const list = yield Model.findAll(match);
-      totalrecords = yield Model.count(_.omit(match, ['attributes']));
+    const list = yield Model.findAll(match);
+    totalrecords = yield Model.count(_.omit(match, ['attributes']));
 
-      if (q.range === 'PAGE') {
-        totalpages = Math.ceil(totalrecords / q.size);
-        ctx.status = 200;
-        ctx.body = {
-          cond: q.cond,
-          page: q.page,
-          size: q.size,
-          sort: q.sort,
-          project: q.project,
-          populate: q.populate,
-          totalpages,
-          totalrecords,
-          list
-        };
-      } else {
-        ctx.status = 200;
-        ctx.body = {
-          cond: q.cond,
-          sort: q.sort,
-          project: q.project,
-          populate: q.populate,
-          totalrecords,
-          list
-        };
-      }
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
+    if (q.range === 'PAGE') {
+      totalpages = Math.ceil(totalrecords / q.size);
+      ctx.status = 200;
       ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
+        cond: q.cond,
+        page: q.page,
+        size: q.size,
+        sort: q.sort,
+        project: q.project,
+        populate: q.populate,
+        totalpages,
+        totalrecords,
+        list
+      };
+    } else {
+      ctx.status = 200;
+      ctx.body = {
+        cond: q.cond,
+        sort: q.sort,
+        project: q.project,
+        populate: q.populate,
+        totalrecords,
+        list
       };
     }
   });
@@ -142,26 +124,17 @@ repo.create =
 /*#__PURE__*/
 function () {
   var _ref3 = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      const Model = ext.Model(name);
-      let form = ctx.request.body;
-      form.docs = form.docs.map(doc => {
-        doc.createdAt = new Date();
-        return doc;
-      });
-      form = yield opts.routeHooks.create.form(form, ctx, {
-        name
-      });
-      ctx.status = 200;
-      ctx.body = yield Model.bulkCreate(form.docs);
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
-      ctx.body = {
-        message: error.message,
-        stack: error.stack || error.message
-      };
-    }
+    const Model = ext.Model(name);
+    let form = ctx.request.body;
+    form.docs = form.docs.map(doc => {
+      doc.createdAt = new Date();
+      return doc;
+    });
+    form = yield opts.routeHooks.create.form(form, ctx, {
+      name
+    });
+    ctx.status = 200;
+    ctx.body = yield Model.bulkCreate(form.docs);
   });
 
   return function (_x9, _x10, _x11, _x12) {
@@ -173,44 +146,35 @@ repo.delete =
 /*#__PURE__*/
 function () {
   var _ref4 = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      const Model = ext.Model(name);
-      let form = ctx.request.body;
+    const Model = ext.Model(name);
+    let form = ctx.request.body;
 
-      for (let index = 0; index < form.docs.length; index++) {
-        const doc = form.docs[index];
+    for (let index = 0; index < form.docs.length; index++) {
+      const doc = form.docs[index];
 
-        if (doc['id'] === undefined || doc['id'] === '' || doc['id'] === null) {
-          throw new Error('no id found');
-        }
+      if (doc['id'] === undefined || doc['id'] === '' || doc['id'] === null) {
+        throw new Error('no id found');
       }
+    }
 
-      form = yield opts.routeHooks.delete.form(form, {
+    form = yield opts.routeHooks.delete.form(form, {
+      name
+    });
+    const results = [];
+
+    for (const doc of form.docs) {
+      doc.deletedAt = new Date();
+      const cond = yield opts.routeHooks.delete.cond(_.pick(doc, ['id']), ctx, {
         name
       });
-      const results = [];
-
-      for (const doc of form.docs) {
-        doc.deletedAt = new Date();
-        const cond = yield opts.routeHooks.delete.cond(_.pick(doc, ['id']), ctx, {
-          name
-        });
-        const ret = yield Model.update(_.pick(doc, ['deletedAt']), {
-          where: cond
-        });
-        results.push(ret);
-      }
-
-      ctx.status = 200;
-      ctx.body = results;
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
-      ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
-      };
+      const ret = yield Model.update(_.pick(doc, ['deletedAt']), {
+        where: cond
+      });
+      results.push(ret);
     }
+
+    ctx.status = 200;
+    ctx.body = results;
   });
 
   return function (_x13, _x14, _x15, _x16) {
@@ -222,45 +186,36 @@ repo.update =
 /*#__PURE__*/
 function () {
   var _ref5 = _asyncToGenerator(function* (name, ctx, ext, opts) {
-    try {
-      const Model = ext.Model(name);
-      let form = ctx.request.body;
+    const Model = ext.Model(name);
+    let form = ctx.request.body;
 
-      for (let index = 0; index < form.docs.length; index++) {
-        const doc = form.docs[index];
+    for (let index = 0; index < form.docs.length; index++) {
+      const doc = form.docs[index];
 
-        if (doc['id'] === undefined || doc['id'] === '' || doc['id'] === null) {
-          throw new Error('no id found');
-        }
+      if (doc['id'] === undefined || doc['id'] === '' || doc['id'] === null) {
+        throw new Error('no id found');
       }
+    }
 
-      form = yield opts.routeHooks.update.form(form, {
+    form = yield opts.routeHooks.update.form(form, {
+      name
+    });
+    const results = [];
+
+    for (const doc of form.docs) {
+      const cond = yield opts.routeHooks.update.cond(_.pick(doc, ['id']), ctx, {
         name
       });
-      const results = [];
-
-      for (const doc of form.docs) {
-        const cond = yield opts.routeHooks.update.cond(_.pick(doc, ['id']), ctx, {
-          name
-        });
-        doc.updatedAt = new Date();
-        const ret = yield Model.update(doc, {
-          where: cond,
-          fields: Object.keys(doc)
-        });
-        results.push(ret);
-      }
-
-      ctx.status = 200;
-      ctx.body = results;
-    } catch (error) {
-      logger.error(error.stack || error.message);
-      ctx.status = 500;
-      ctx.body = {
-        message: 'Internal Server Error',
-        stack: error.stack || error.message
-      };
+      doc.updatedAt = new Date();
+      const ret = yield Model.update(doc, {
+        where: cond,
+        fields: Object.keys(doc)
+      });
+      results.push(ret);
     }
+
+    ctx.status = 200;
+    ctx.body = results;
   });
 
   return function (_x17, _x18, _x19, _x20) {

@@ -62,10 +62,10 @@
     "koa-send": "^5.0.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "mongoose": "^5.6.8",
+    "mongoose": "^5.6.9",
     "mysql2": "^1.6.5",
     "pluralize": "^8.0.0",
-    "sequelize": "^5.12.3",
+    "sequelize": "^5.13.0",
     "winston": "^3.2.1"
   }
 }
