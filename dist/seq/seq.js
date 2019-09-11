@@ -126,7 +126,7 @@ repo.Ext.prototype.plugin = function (_ref2) {
   } = _ref2;
 
   for (const item of this.m) {
-    if (item.autoHook === true || item.autoHook === undefined) {
+    if (item.autoHook) {
       this.api.ALL(router, item.name);
     }
   }
