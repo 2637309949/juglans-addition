@@ -17,7 +17,7 @@ const _ = require('lodash');
 
 const hook = require('./hook');
 
-const handler = require('./handler');
+const rest = require('./rest');
 
 const repo = module.exports; // Api defined api for api default
 // ,, ext ref mongoExt
@@ -75,7 +75,7 @@ repo.Api.prototype.Name = function (name) {
     featurePrefix: `/${name}`
   }]);
   return this;
-}; // One defined query for one item
+}; // One defined query one item
 // ,, Pre hook defined pre One
 // ,, Post hook defined post One
 // ,, Auth hook defined auth One
@@ -92,7 +92,7 @@ repo.Api.prototype.One = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.one(name, ctx, this.ext, opts)
+    handler: ctx => rest.one(name, ctx, this.ext, opts)
   });
 
   for (var _len = arguments.length, middles = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -107,7 +107,11 @@ repo.Api.prototype.One = function (router, name) {
     apis: ['one']
   }));
   return h;
-};
+}; // List defined query list items
+// ,, Pre hook defined pre One
+// ,, Post hook defined post One
+// ,, Auth hook defined auth One
+
 
 repo.Api.prototype.List = function (router, name) {
   const profile = this.ext.Profile(name);
@@ -120,7 +124,7 @@ repo.Api.prototype.List = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.list(name, ctx, this.ext, opts)
+    handler: ctx => rest.list(name, ctx, this.ext, opts)
   });
 
   for (var _len2 = arguments.length, middles = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
@@ -135,7 +139,11 @@ repo.Api.prototype.List = function (router, name) {
     apis: ['list']
   }));
   return h;
-};
+}; // Create defined create items
+// ,, Pre hook defined pre One
+// ,, Post hook defined post One
+// ,, Auth hook defined auth One
+
 
 repo.Api.prototype.Create = function (router, name) {
   const profile = this.ext.Profile(name);
@@ -148,7 +156,7 @@ repo.Api.prototype.Create = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.create(name, ctx, this.ext, opts)
+    handler: ctx => rest.create(name, ctx, this.ext, opts)
   });
 
   for (var _len3 = arguments.length, middles = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
@@ -163,7 +171,11 @@ repo.Api.prototype.Create = function (router, name) {
     apis: ['create']
   }));
   return h;
-};
+}; // Update defined update items
+// ,, Pre hook defined pre One
+// ,, Post hook defined post One
+// ,, Auth hook defined auth One
+
 
 repo.Api.prototype.Update = function (router, name) {
   const profile = this.ext.Profile(name);
@@ -176,7 +188,7 @@ repo.Api.prototype.Update = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.update(name, ctx, this.ext, opts)
+    handler: ctx => rest.update(name, ctx, this.ext, opts)
   });
 
   for (var _len4 = arguments.length, middles = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
@@ -191,7 +203,11 @@ repo.Api.prototype.Update = function (router, name) {
     apis: ['update']
   }));
   return h;
-};
+}; // Delete defined delete items
+// ,, Pre hook defined pre One
+// ,, Post hook defined post One
+// ,, Auth hook defined auth One
+
 
 repo.Api.prototype.Delete = function (router, name) {
   const profile = this.ext.Profile(name);
@@ -204,7 +220,7 @@ repo.Api.prototype.Delete = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.delete(name, ctx, this.ext, opts)
+    handler: ctx => rest.delete(name, ctx, this.ext, opts)
   });
 
   for (var _len5 = arguments.length, middles = new Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
@@ -219,7 +235,11 @@ repo.Api.prototype.Delete = function (router, name) {
     apis: ['delete']
   }));
   return h;
-};
+}; // ALL defined curd
+// ,, Pre hook defined pre One
+// ,, Post hook defined post One
+// ,, Auth hook defined auth One
+
 
 repo.Api.prototype.ALL = function (router, name) {
   var _this = this;
@@ -248,7 +268,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.one(name, ctx, _this.ext, opts)
+        handler: ctx => rest.one(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -272,7 +292,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.list(name, ctx, _this.ext, opts)
+        handler: ctx => rest.list(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -296,7 +316,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.create(name, ctx, _this.ext, opts)
+        handler: ctx => rest.create(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -320,7 +340,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.update(name, ctx, _this.ext, opts)
+        handler: ctx => rest.update(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -344,7 +364,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.delete(name, ctx, _this.ext, opts)
+        handler: ctx => rest.delete(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);

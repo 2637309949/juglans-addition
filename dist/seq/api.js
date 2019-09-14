@@ -13,7 +13,7 @@ const merge = require('deepmerge');
 
 const _ = require('lodash');
 
-const handler = require('./handler');
+const rest = require('./rest');
 
 const hook = require('./hook');
 
@@ -92,7 +92,7 @@ repo.Api.prototype.One = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.one(name, ctx, this.ext, opts)
+    handler: ctx => rest.one(name, ctx, this.ext, opts)
   });
 
   for (var _len = arguments.length, middles = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -120,7 +120,7 @@ repo.Api.prototype.List = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.list(name, ctx, this.ext, opts)
+    handler: ctx => rest.list(name, ctx, this.ext, opts)
   });
 
   for (var _len2 = arguments.length, middles = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
@@ -148,7 +148,7 @@ repo.Api.prototype.Create = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.create(name, ctx, this.ext, opts)
+    handler: ctx => rest.create(name, ctx, this.ext, opts)
   });
 
   for (var _len3 = arguments.length, middles = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
@@ -176,7 +176,7 @@ repo.Api.prototype.Update = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.update(name, ctx, this.ext, opts)
+    handler: ctx => rest.update(name, ctx, this.ext, opts)
   });
 
   for (var _len4 = arguments.length, middles = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
@@ -204,7 +204,7 @@ repo.Api.prototype.Delete = function (router, name) {
     routeHooks: hooks => {
       opts.routeHooks = merge.all([opts.routeHooks, hooks]);
     },
-    handler: ctx => handler.delete(name, ctx, this.ext, opts)
+    handler: ctx => rest.delete(name, ctx, this.ext, opts)
   });
 
   for (var _len5 = arguments.length, middles = new Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
@@ -248,7 +248,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.one(name, ctx, _this.ext, opts)
+        handler: ctx => rest.one(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -272,7 +272,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.list(name, ctx, _this.ext, opts)
+        handler: ctx => rest.list(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -296,7 +296,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.create(name, ctx, _this.ext, opts)
+        handler: ctx => rest.create(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -320,7 +320,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.update(name, ctx, _this.ext, opts)
+        handler: ctx => rest.update(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
@@ -344,7 +344,7 @@ repo.Api.prototype.ALL = function (router, name) {
         routeHooks: hooks => {
           opts.routeHooks = merge.all([opts.routeHooks, hooks]);
         },
-        handler: ctx => handler.delete(name, ctx, _this.ext, opts)
+        handler: ctx => rest.delete(name, ctx, _this.ext, opts)
       });
       h1.Pre(h.pre);
       h1.Post(h.post);
